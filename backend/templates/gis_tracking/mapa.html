@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Mapa de Tracking - Monitor Infantil{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col">
+        <h2>🗺️ Mapa de Tracking en Tiempo Real</h2>
+        <p class="text-muted">Visualización de posiciones GPS de niños y áreas seguras</p>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary" id="btnRefresh">
+            🔄 Actualizar Mapa
+        </button>
+    </div>
+</div>
+
+<!-- Leyenda -->
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body py-2">
+                <strong>Leyenda:</strong>
+                <span class="ms-3">🟢 Dentro del área segura</span>
+                <span class="ms-3">🔴 Fuera del área segura</span>
+                <span class="ms-3">🏫 Centro educativo</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mapa -->
+<div class="row">
+    <div class="col-md-9">
+        <div id="map"></div>
+    </div>
+    
+    <!-- Sidebar con lista de niños -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5>👶 Niños Monitoreados</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="ninosList">
+                    <div class="list-group-item text-center">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        Cargando niños...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Inicializar mapa centrado en Santa Cruz, Bolivia
+const map = L.map('map').setView([-17.7833, -63.1812], 15);
+
+// Agregar capa de OpenStreetMap
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 19
+}).addTo(map);
+
+// Capas para organizar elementos
+const capaCentros = L.layerGroup().addTo(map);
+const capaPosiciones = L.layerGroup().addTo(map);
+
+// Función para cargar centros educativos
+async function cargarCentros() {
+    try {
+        const response = await fetch('/api/centros/', {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            }
+        });
+        
+        if (!response.ok) {
+            console.error('Error al cargar centros');
+            return;
+        }
+        
+        const data = await response.json();
+        capaCentros.clearLayers();
+        
+        data.features.forEach(centro => {
+            // Dibujar polígono del área segura
+            const coords = centro.geometry.coordinates[0].map(c => [c[1], c[0]]);
+            const polygon = L.polygon(coords, {
+                color: '#007bff',
+                fillColor: '#007bff',
+                fillOpacity: 0.2,
+                weight: 2
+            }).addTo(capaCentros);
+            
+            polygon.bindPopup(`
+                <strong>${centro.properties.nombre}</strong><br>
+                ${centro.properties.direccion}
+            `);
+        });
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Función para cargar posiciones de niños
+async function cargarPosiciones() {
+    try {
+        const response = await fetch('/api/ninos/', {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            }
+        });
+        
+        if (!response.ok) {
+            console.error('Error al cargar niños');
+            return;
+        }
+        
+        const ninos = await response.json();
+        capaPosiciones.clearLayers();
+        
+        let ninosHTML = '';
+        
+        for (const nino of ninos) {
+            // Obtener última posición
+            const estadoResponse = await fetch(`/api/ninos/${nino.id}/estado/`, {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                }
+            });
+            
+            if (!estadoResponse.ok) continue;
+            
+            const estado = await estadoResponse.json();
+            
+            if (estado.ultima_posicion) {
+                const coords = estado.ultima_posicion.geometry.coordinates;
+                const lat = coords[1];
+                const lng = coords[0];
+                
+                // Icono según estado
+                const icon = estado.dentro_area_segura 
+                    ? '🟢' 
+                    : '🔴';
+                
+                const marker = L.marker([lat, lng], {
+                    icon: L.divIcon({
+                        html: `<div style="font-size: 24px;">${icon}</div>`,
+                        className: 'custom-marker',
+                        iconSize: [30, 30]
+                    })
+                }).addTo(capaPosiciones);
+                
+                marker.bindPopup(`
+                    <strong>${nino.nombre_completo}</strong><br>
+                    Estado: ${estado.dentro_area_segura ? '✅ Dentro del área' : '⚠️ Fuera del área'}<br>
+                    Batería: ${estado.nivel_bateria || 'N/A'}%<br>
+                    <small>${estado.ultima_posicion.properties.timestamp}</small>
+                `);
+                
+                // Agregar a lista lateral
+                const estadoClass = estado.dentro_area_segura ? 'dentro-area' : 'fuera-area';
+                ninosHTML += `
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <strong>${nino.nombre}</strong>
+                            <span class="${estadoClass}">${icon}</span>
+                        </div>
+                        <small class="text-muted">${nino.centro_educativo.nombre}</small>
+                    </div>
+                `;
+            }
+        }
+        
+        document.getElementById('ninosList').innerHTML = ninosHTML || 
+            '<div class="list-group-item">No hay datos disponibles</div>';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('ninosList').innerHTML = 
+            '<div class="list-group-item text-danger">Error al cargar datos</div>';
+    }
+}
+
+// Botón refrescar
+document.getElementById('btnRefresh').addEventListener('click', () => {
+    cargarCentros();
+    cargarPosiciones();
+});
+
+// Cargar datos iniciales (en modo desarrollo sin autenticación)
+// En producción, descomentar y usar JWT
+cargarCentros();
+cargarPosiciones();
+
+// Auto-refresh cada 30 segundos
+setInterval(() => {
+    cargarPosiciones();
+}, 30000);
+</script>
+{% endblock %}

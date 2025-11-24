@@ -1,0 +1,26 @@
+# Base requirements
+-r base.txt
+
+# Production web server
+gunicorn==21.2.0
+
+# Production database
+dj-database-url==2.1.0
+
+# Static files serving
+whitenoise==6.6.0
+
+# Monitoring and logging
+sentry-sdk==1.38.0
+
+# Environment
+python-decouple==3.8
+
+# Security
+django-security==0.20.0
+
+# HTTPS redirect
+django-sslserver==0.22
+
+# Performance
+django-cachalot==2.6.1

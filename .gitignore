@@ -1,0 +1,60 @@
+# Python
+*.py[cod]
+*$py.class
+__pycache__/
+*.so
+.Python
+backend/venv/
+backend/env/
+backend/ENV/
+*.egg-info/
+backend/dist/
+backend/build/
+
+# Django
+*.log
+backend/local_settings.py
+backend/db.sqlite3
+backend/db.sqlite3-journal
+backend/media/
+backend/staticfiles/
+
+# Environment variables
+backend/.env
+backend/.env.local
+
+# Flutter/Dart
+mobile/**/.dart_tool/
+mobile/**/.packages
+mobile/**/build/
+mobile/**/.flutter-plugins
+mobile/**/.flutter-plugins-dependencies
+mobile/**/.metadata
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.sql
+*.db
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Docker
+*.pid
+
+# Node modules (si se usa en web/)
+web/node_modules/
+web/dist/
+web/package-lock.json

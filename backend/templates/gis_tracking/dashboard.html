@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Monitor Infantil{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>📊 Dashboard de Monitoreo</h2>
+        <p class="text-muted">Vista general del sistema de monitoreo infantil</p>
+    </div>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card card-stat">
+            <div class="card-body">
+                <h6 class="text-muted">Niños Registrados</h6>
+                <h3>{{ total_ninos|default:0 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-stat">
+            <div class="card-body">
+                <h6 class="text-muted">Dentro del Área</h6>
+                <h3 class="text-success">{{ dentro_area|default:0 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-stat">
+            <div class="card-body">
+                <h6 class="text-muted">Alertas Activas</h6>
+                <h3 class="text-danger">{{ alertas_activas|default:0 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-stat">
+            <div class="card-body">
+                <h6 class="text-muted">Centros Educativos</h6>
+                <h3>{{ total_centros|default:0 }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones Rápidas -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5>🗺️ Acciones Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'gis_tracking:mapa_tracking' %}" class="btn btn-outline-primary">
+                        Ver Mapa en Tiempo Real
+                    </a>
+                    <a href="/admin/gis_tracking/nino/" class="btn btn-outline-secondary">
+                        Gestionar Niños
+                    </a>
+                    <a href="/admin/gis_tracking/centroeducativo/" class="btn btn-outline-secondary">
+                        Gestionar Centros Educativos
+                    </a>
+                    <a href="/admin/alerts/alerta/" class="btn btn-outline-warning">
+                        Ver Alertas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h5>⚠️ Alertas Recientes</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% if alertas_recientes %}
+                        {% for alerta in alertas_recientes %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ alerta.nino.nombre_completo }}</strong>
+                                <span class="badge bg-danger">{{ alerta.get_tipo_alerta_display }}</span>
+                            </div>
+                            <small class="text-muted">{{ alerta.fecha_creacion|date:"d/m/Y H:i" }}</small>
+                            <p class="mb-0">{{ alerta.mensaje|truncatewords:15 }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-success mb-0">
+                            ✅ No hay alertas activas
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Instrucciones -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5>📘 Guía de Inicio Rápido</h5>
+            </div>
+            <div class="card-body">
+                <ol>
+                    <li><strong>Crear Centro Educativo:</strong> Ve a Administración → Centros Educativos → Agregar. Dibuja el polígono del área segura en el mapa.</li>
+                    <li><strong>Registrar Tutor:</strong> Administración → Tutores → Agregar tutor.</li>
+                    <li><strong>Registrar Niño:</strong> Administración → Niños → Agregar niño y asignar al centro educativo y tutor.</li>
+                    <li><strong>Enviar Posiciones GPS:</strong> Usar la API REST desde la app móvil:
+                        <code>POST /api/ninos/{id}/registrar_posicion/</code>
+                    </li>
+                    <li><strong>Ver Mapa en Vivo:</strong> Click en "Ver Mapa en Tiempo Real" arriba.</li>
+                </ol>
+                
+                <div class="alert alert-info mt-3">
+                    <strong>💡 Tip:</strong> La documentación completa de la API está en 
+                    <code>apps/api/API_DOCS.md</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

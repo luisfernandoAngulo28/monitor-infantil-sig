@@ -1,0 +1,32 @@
+# Core Django
+Django==5.0.0
+psycopg2-binary==2.9.9
+
+# GeoDjango dependencies
+GDAL==3.8.0
+Pillow==10.1.0
+
+# API
+djangorestframework==3.14.0
+djangorestframework-gis==1.0
+django-cors-headers==4.3.1
+
+# Authentication
+djangorestframework-simplejwt==5.3.1
+
+# Environment variables
+python-decouple==3.8
+
+# Utilities
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Celery for async tasks
+celery==5.3.4
+redis==5.0.1
+
+# Firebase Admin SDK (push notifications)
+firebase-admin==6.3.0
+
+# Django filters
+django-filter==23.5

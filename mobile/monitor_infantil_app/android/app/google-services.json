@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "949928163928",
+    "project_id": "proyecto-monitor-infantil",
+    "storage_bucket": "proyecto-monitor-infantil.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:949928163928:android:5ac23d58e100389b9aa82d",
+        "android_client_info": {
+          "package_name": "com.example.monitor_infantil_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1PgG6eveZsF_5g83eNf3DCioEBcYX-w8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

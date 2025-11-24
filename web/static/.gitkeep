@@ -1,0 +1,23 @@
+# Carpeta Web
+
+Contiene el frontend web del proyecto (actualmente integrado en Django).
+
+## Estructura Futura
+
+```
+web/
+├── static/
+│   ├── css/
+│   │   └── custom.css      # Estilos personalizados
+│   ├── js/
+│   │   └── mapa.js         # JavaScript para mapas
+│   └── img/
+│       └── logo.png
+└── README.md
+```
+
+## Nota
+
+Los templates HTML actualmente están en `../backend/templates/`.
+
+Si en el futuro se migra a un framework frontend separado (React, Vue, etc.), esta carpeta contendrá ese proyecto.
