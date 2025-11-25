@@ -88,7 +88,7 @@ def crear_usuarios_tutores():
             'email': 'maria.lopez@gmail.com',
             'first_name': 'María',
             'last_name': 'López González',
-            'es_tutor': True
+            'tipo_usuario': 'TUTOR'
         }
     )
     if created:
@@ -99,9 +99,9 @@ def crear_usuarios_tutores():
     tutor1, created = Tutor.objects.get_or_create(
         usuario=user1,
         defaults={
-            'celular': '70123456',
-            'direccion': 'Barrio Equipetrol, Santa Cruz',
-            'relacion_nino': 'madre'
+            'ci': '1234567 SC',
+            'relacion': 'MADRE',
+            'telefono_emergencia': '70123456'
         }
     )
     if created:
@@ -114,7 +114,7 @@ def crear_usuarios_tutores():
             'email': 'juan.perez@gmail.com',
             'first_name': 'Juan',
             'last_name': 'Pérez Rojas',
-            'es_tutor': True
+            'tipo_usuario': 'TUTOR'
         }
     )
     if created:
@@ -125,9 +125,9 @@ def crear_usuarios_tutores():
     tutor2, created = Tutor.objects.get_or_create(
         usuario=user2,
         defaults={
-            'celular': '75987654',
-            'direccion': 'Barrio Urbarí, Santa Cruz',
-            'relacion_nino': 'padre'
+            'ci': '7654321 SC',
+            'relacion': 'PADRE',
+            'telefono_emergencia': '75987654'
         }
     )
     if created:

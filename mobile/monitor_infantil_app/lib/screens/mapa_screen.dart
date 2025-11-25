@@ -48,7 +48,10 @@ class _MapaScreenState extends State<MapaScreen> {
         }
 
         // Si no hay niño seleccionado, seleccionar el primero
-        _ninoSeleccionado ??= ninosProvider.ninos.first;
+        if (_ninoSeleccionado == null || 
+            !ninosProvider.ninos.any((n) => n.id == _ninoSeleccionado?.id)) {
+          _ninoSeleccionado = ninosProvider.ninos.first;
+        }
 
         final estado = ninosProvider.getEstado(_ninoSeleccionado!.id);
         final ultimaPosicion = estado?.ultimaPosicion;
@@ -67,8 +70,9 @@ class _MapaScreenState extends State<MapaScreen> {
                     child: DropdownButton<Nino>(
                       isExpanded: true,
                       value: _ninoSeleccionado,
+                      hint: const Text('Selecciona un niño'),
                       items: ninosProvider.ninos.map((nino) {
-                        return DropdownMenuItem(
+                        return DropdownMenuItem<Nino>(
                           value: nino,
                           child: Text(nino.nombreCompleto),
                         );

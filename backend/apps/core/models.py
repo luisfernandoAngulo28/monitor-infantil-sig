@@ -38,6 +38,24 @@ class Usuario(AbstractUser):
     
     notificaciones_activas = models.BooleanField(default=True)
     
+    # Fix para el conflicto de related_name
+    groups = models.ManyToManyField(
+        'auth.Group',
+        verbose_name='groups',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        related_name='usuario_set',
+        related_query_name='usuario',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        verbose_name='user permissions',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_name='usuario_set',
+        related_query_name='usuario',
+    )
+    
     class Meta:
         verbose_name = 'Usuario'
         verbose_name_plural = 'Usuarios'
