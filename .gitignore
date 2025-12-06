@@ -58,3 +58,8 @@ htmlcov/
 web/node_modules/
 web/dist/
 web/package-lock.json
+
+# Clone folders (no subir)
+clone de uber/
+
+clone de uber/

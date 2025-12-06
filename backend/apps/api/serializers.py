@@ -24,6 +24,14 @@ class TutorSerializer(serializers.ModelSerializer):
         fields = ['id', 'usuario', 'relacion', 'ci', 'telefono_emergencia', 'activo']
 
 
+class CentroEducativoSimpleSerializer(serializers.ModelSerializer):
+    """Serializer simple para CentroEducativo (sin campos geo)"""
+    
+    class Meta:
+        model = CentroEducativo
+        fields = ['id', 'nombre', 'codigo', 'direccion', 'telefono', 'activo']
+
+
 class CentroEducativoSerializer(GeoFeatureModelSerializer):
     """Serializer con soporte geoespacial para CentroEducativo"""
     
@@ -35,7 +43,7 @@ class CentroEducativoSerializer(GeoFeatureModelSerializer):
 
 
 class NinoSerializer(serializers.ModelSerializer):
-    centro_educativo = CentroEducativoSerializer(read_only=True)
+    centro_educativo = CentroEducativoSimpleSerializer(read_only=True)
     tutor_principal = TutorSerializer(read_only=True)
     edad = serializers.IntegerField(read_only=True)
     nombre_completo = serializers.CharField(source='nombre_completo', read_only=True)
@@ -46,6 +54,30 @@ class NinoSerializer(serializers.ModelSerializer):
                  'nombre_completo', 'fecha_nacimiento', 'edad', 'sexo', 'foto',
                  'centro_educativo', 'tutor_principal', 'dispositivo_id',
                  'tracking_activo', 'activo']
+
+
+class PosicionGPSSimpleSerializer(serializers.ModelSerializer):
+    """Serializer simple para PosicionGPS (sin campos geo)"""
+    nino_nombre = serializers.CharField(source='nino.nombre_completo', read_only=True)
+    latitud = serializers.SerializerMethodField()
+    longitud = serializers.SerializerMethodField()
+    distancia_centro = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = PosicionGPS
+        fields = ['id', 'nino', 'nino_nombre', 'timestamp', 'dentro_area_segura',
+                 'precision_metros', 'altitud', 'velocidad_kmh', 'nivel_bateria',
+                 'latitud', 'longitud', 'distancia_centro']
+        read_only_fields = ['dentro_area_segura']
+    
+    def get_latitud(self, obj):
+        return obj.ubicacion.y if obj.ubicacion else None
+    
+    def get_longitud(self, obj):
+        return obj.ubicacion.x if obj.ubicacion else None
+    
+    def get_distancia_centro(self, obj):
+        return obj.distancia_al_centro()
 
 
 class PosicionGPSSerializer(GeoFeatureModelSerializer):
@@ -104,7 +136,7 @@ class NotificacionTutorSerializer(serializers.ModelSerializer):
 class EstadoNinoSerializer(serializers.Serializer):
     """Serializer para el estado actual de un niño"""
     nino = NinoSerializer()
-    ultima_posicion = PosicionGPSSerializer(allow_null=True)
+    ultima_posicion = PosicionGPSSimpleSerializer(allow_null=True)
     dentro_area_segura = serializers.BooleanField()
     alertas_activas = serializers.IntegerField()
     nivel_bateria = serializers.IntegerField(allow_null=True)

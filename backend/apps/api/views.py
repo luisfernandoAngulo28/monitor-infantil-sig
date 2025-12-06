@@ -15,8 +15,8 @@ from apps.core.models import Tutor
 
 from .serializers import (
     CentroEducativoSerializer, NinoSerializer, PosicionGPSSerializer,
-    AlertaSerializer, NotificacionTutorSerializer, TutorSerializer,
-    RegistrarPosicionSerializer, EstadoNinoSerializer,
+    PosicionGPSSimpleSerializer, AlertaSerializer, NotificacionTutorSerializer, 
+    TutorSerializer, RegistrarPosicionSerializer, EstadoNinoSerializer,
     ActualizarFirebaseTokenSerializer
 )
 
@@ -66,7 +66,7 @@ class NinoViewSet(viewsets.ReadOnlyModelViewSet):
         
         data = {
             'nino': NinoSerializer(nino).data,
-            'ultima_posicion': PosicionGPSSerializer(ultima_pos).data if ultima_pos else None,
+            'ultima_posicion': PosicionGPSSimpleSerializer(ultima_pos).data if ultima_pos else None,
             'dentro_area_segura': estado_info.get('dentro_area', None),
             'alertas_activas': alertas_activas,
             'nivel_bateria': estado_info.get('nivel_bateria'),

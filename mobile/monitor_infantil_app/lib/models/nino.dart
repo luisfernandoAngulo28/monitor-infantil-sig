@@ -1,12 +1,12 @@
 class Nino {
   final int id;
-  final String nombre;
-  final String apellidoPaterno;
+  final String? nombre;
+  final String? apellidoPaterno;
   final String? apellidoMaterno;
-  final String nombreCompleto;
-  final String fechaNacimiento;
-  final int edad;
-  final String sexo;
+  final String? nombreCompleto;
+  final String? fechaNacimiento;
+  final int? edad;
+  final String? sexo;
   final String? foto;
   final CentroEducativo centroEducativo;
   final bool trackingActivo;
@@ -14,13 +14,13 @@ class Nino {
 
   Nino({
     required this.id,
-    required this.nombre,
-    required this.apellidoPaterno,
+    this.nombre,
+    this.apellidoPaterno,
     this.apellidoMaterno,
-    required this.nombreCompleto,
-    required this.fechaNacimiento,
-    required this.edad,
-    required this.sexo,
+    this.nombreCompleto,
+    this.fechaNacimiento,
+    this.edad,
+    this.sexo,
     this.foto,
     required this.centroEducativo,
     required this.trackingActivo,
@@ -47,16 +47,16 @@ class Nino {
 
 class CentroEducativo {
   final int id;
-  final String nombre;
-  final String codigo;
-  final String direccion;
+  final String? nombre;
+  final String? codigo;
+  final String? direccion;
   final String? telefono;
 
   CentroEducativo({
     required this.id,
-    required this.nombre,
-    required this.codigo,
-    required this.direccion,
+    this.nombre,
+    this.codigo,
+    this.direccion,
     this.telefono,
   });
 

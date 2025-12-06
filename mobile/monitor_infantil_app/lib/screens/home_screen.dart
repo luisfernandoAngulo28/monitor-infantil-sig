@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/ninos_provider.dart';
 import '../providers/auth_provider.dart';
 import 'mapa_screen.dart';
+import 'mapa_realtime_screen_example.dart';
 import 'alertas_screen.dart';
 import 'login_screen.dart';
 
@@ -28,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final screens = [
-      const MapaScreen(),
+      const MapaRealTimeScreen(), // Pantalla con WebSocket en tiempo real
       const AlertasScreen(),
     ];
 

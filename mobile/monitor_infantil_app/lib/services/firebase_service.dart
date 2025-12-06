@@ -15,7 +15,7 @@ class FirebaseService {
 
   // Inicializar Firebase Messaging
   Future<void> initialize() async {
-    // Solicitar permisos
+    // Solicitar permisosm
     NotificationSettings settings = await _firebaseMessaging.requestPermission(
       alert: true,
       badge: true,

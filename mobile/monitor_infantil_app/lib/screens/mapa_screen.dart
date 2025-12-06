@@ -74,7 +74,7 @@ class _MapaScreenState extends State<MapaScreen> {
                       items: ninosProvider.ninos.map((nino) {
                         return DropdownMenuItem<Nino>(
                           value: nino,
-                          child: Text(nino.nombreCompleto),
+                          child: Text(nino.nombreCompleto ?? '${nino.nombre} ${nino.apellidoPaterno}'),
                         );
                       }).toList(),
                       onChanged: (nino) {

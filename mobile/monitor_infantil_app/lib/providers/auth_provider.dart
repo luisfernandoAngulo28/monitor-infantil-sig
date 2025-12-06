@@ -6,15 +6,28 @@ class AuthProvider extends ChangeNotifier {
   
   bool _isAuthenticated = false;
   bool _isLoading = false;
+  int? _tutorId;
+  String? _token;
 
   bool get isAuthenticated => _isAuthenticated;
   bool get isLoading => _isLoading;
+  int? get tutorId => _tutorId;
+  String? get token => _token;
 
   Future<void> checkAuthStatus() async {
     _isLoading = true;
     notifyListeners();
 
     _isAuthenticated = await _authService.isLoggedIn();
+    
+    // Si está autenticado, cargar tutorId y token
+    if (_isAuthenticated) {
+      _tutorId = await _authService.getTutorId();
+      _token = await _authService.getToken();
+    } else {
+      _tutorId = null;
+      _token = null;
+    }
     
     _isLoading = false;
     notifyListeners();
@@ -28,6 +41,9 @@ class AuthProvider extends ChangeNotifier {
     
     if (success) {
       _isAuthenticated = true;
+      // Obtener tutorId y token del servicio
+      _tutorId = await _authService.getTutorId();
+      _token = await _authService.getToken();
     }
     
     _isLoading = false;
@@ -39,6 +55,8 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     await _authService.logout();
     _isAuthenticated = false;
+    _tutorId = null;
+    _token = null;
     notifyListeners();
   }
 }

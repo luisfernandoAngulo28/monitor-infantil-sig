@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'providers/auth_provider.dart';
 import 'providers/ninos_provider.dart';
+import 'providers/gps_tracking_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'services/firebase_service.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => NinosProvider()),
+        ChangeNotifierProvider(create: (_) => GPSTrackingProvider()),
       ],
       child: MaterialApp(
         title: 'Monitor Infantil',

@@ -74,7 +74,7 @@ class _MapaScreenState extends State<MapaScreen> {
                       items: ninosProvider.ninos.map((nino) {
                         return DropdownMenuItem<Nino>(
                           value: nino,
-                          child: Text(nino.nombreCompleto),
+                          child: Text(nino.nombreCompleto ?? '${nino.nombre ?? 'Niño'} ${nino.apellidoPaterno ?? ''}'),
                         );
                       }).toList(),
                       onChanged: (nino) {
@@ -160,7 +160,7 @@ class _MapaScreenState extends State<MapaScreen> {
                                 : BitmapDescriptor.hueRed,
                           ),
                           infoWindow: InfoWindow(
-                            title: _ninoSeleccionado!.nombreCompleto,
+                            title: _ninoSeleccionado!.nombreCompleto ?? '${_ninoSeleccionado!.nombre ?? 'Niño'} ${_ninoSeleccionado!.apellidoPaterno ?? ''}',
                             snippet: estado?.dentroAreaSegura == true
                                 ? 'En área segura'
                                 : 'Fuera del área',

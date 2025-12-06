@@ -25,6 +25,11 @@ pytz==2023.3
 celery==5.3.4
 redis==5.0.1
 
+# WebSockets / Channels
+channels==4.0.0
+channels-redis==4.1.0
+daphne==4.0.0
+
 # Firebase Admin SDK (push notifications)
 firebase-admin==6.3.0
 

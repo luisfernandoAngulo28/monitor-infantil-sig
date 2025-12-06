@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'dart:convert';
 import '../config/api_config.dart';
 
 class AuthService {
@@ -35,20 +36,29 @@ class AuthService {
       print('📦 Response data: ${response.data}');
 
       if (response.statusCode == 200) {
-        // Django Rest Framework Token Authentication devuelve: {"token": "xxx"}
-        final token = response.data['token'] as String?;
+        // JWT Authentication devuelve: {"access": "xxx", "refresh": "yyy"}
+        final accessToken = response.data['access'] as String?;
+        final refreshToken = response.data['refresh'] as String?;
         
-        if (token == null) {
-          print('❌ Token es null en la respuesta');
+        if (accessToken == null) {
+          print('❌ Access token es null en la respuesta');
           return false;
         }
         
-        print('✅ Token recibido: ${token.substring(0, 10)}...');
+        print('✅ Access token recibido: ${accessToken.substring(0, 10)}...');
         
         await _storage.write(
           key: 'access_token',
-          value: token,
+          value: accessToken,
         );
+        
+        if (refreshToken != null) {
+          await _storage.write(
+            key: 'refresh_token',
+            value: refreshToken,
+          );
+        }
+        
         return true;
       }
       
@@ -104,5 +114,38 @@ class AuthService {
   Future<bool> isLoggedIn() async {
     final token = await getAccessToken();
     return token != null;
+  }
+
+  Future<String?> getToken() async {
+    return await getAccessToken();
+  }
+
+  Future<int?> getTutorId() async {
+    try {
+      final token = await getAccessToken();
+      if (token == null) return null;
+
+      // Decodificar JWT (formato: header.payload.signature)
+      final parts = token.split('.');
+      if (parts.length != 3) return null;
+
+      // Decodificar el payload (parte central)
+      final payload = parts[1];
+      final normalized = base64Url.normalize(payload);
+      final decoded = utf8.decode(base64Url.decode(normalized));
+      final Map<String, dynamic> payloadMap = json.decode(decoded);
+
+      // El JWT contiene user_id que puede ser String o int
+      final userId = payloadMap['user_id'];
+      if (userId is int) {
+        return userId;
+      } else if (userId is String) {
+        return int.tryParse(userId);
+      }
+      return null;
+    } catch (e) {
+      print('❌ Error decodificando JWT: $e');
+      return null;
+    }
   }
 }

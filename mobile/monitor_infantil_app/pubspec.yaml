@@ -46,6 +46,7 @@ dependencies:
   flutter_local_notifications: ^19.5.0
   google_maps_flutter: ^2.14.0
   shared_preferences: ^2.5.3
+  web_socket_channel: ^3.0.1  # WebSocket para tiempo real
 
 dev_dependencies:
   flutter_test:
