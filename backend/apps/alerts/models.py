@@ -121,18 +121,55 @@ class Alerta(models.Model):
     
     def enviar_notificaciones(self):
         """
-        Envía notificaciones push a todos los tutores
+        Envía notificaciones push tipificadas a todos los tutores
+        Usa el nuevo sistema de NotificationService mejorado
         """
-        from .services import NotificacionService
+        from .notifications import NotificationService, TipoAlerta
         
         # Obtener todos los tutores (principal + adicionales)
         tutores = [self.nino.tutor_principal]
-        tutores.extend(self.nino.tutores_adicionales.all())
+        if hasattr(self.nino, 'tutores_adicionales'):
+            tutores.extend(self.nino.tutores_adicionales.all())
         
+        # Enviar notificación tipificada según el tipo de alerta
         for tutor in tutores:
-            NotificacionService.enviar_push_notification(
+            if not tutor.fcm_token:
+                continue  # Saltar si no tiene token FCM
+            
+            enviada = False
+            
+            # Seleccionar método según tipo de alerta
+            if self.tipo_alerta == 'SALIDA_AREA' and self.posicion_gps:
+                enviada = NotificationService.notificar_salida_area(
+                    fcm_token=tutor.fcm_token,
+                    nino_nombre=self.nino.nombre_completo(),
+                    kinder_nombre=self.nino.centro_educativo.nombre,
+                    distancia_metros=getattr(self.posicion_gps, 'distancia_centro', 0) or 0,
+                    ubicacion_actual=f"{self.posicion_gps.ubicacion.y}, {self.posicion_gps.ubicacion.x}"
+                )
+            
+            elif self.tipo_alerta == 'BATERIA_BAJA':
+                nivel_bateria = int(self.mensaje.split('%')[0].split()[-1]) if '%' in self.mensaje else 20
+                enviada = NotificationService.notificar_bateria_baja(
+                    fcm_token=tutor.fcm_token,
+                    nino_nombre=self.nino.nombre_completo(),
+                    nivel_bateria=nivel_bateria
+                )
+            
+            else:
+                # Notificación genérica para otros tipos
+                enviada = NotificationService.enviar_notificacion(
+                    fcm_token=tutor.fcm_token,
+                    tipo=TipoAlerta.SALIDA_AREA,  # Default
+                    nino_nombre=self.nino.nombre_completo(),
+                    mensaje_extra=self.mensaje[:100]
+                )
+            
+            # Registrar notificación
+            NotificacionTutor.objects.create(
+                alerta=self,
                 tutor=tutor,
-                alerta=self
+                enviada_exitosamente=enviada
             )
         
         self.estado = 'ENVIADA'

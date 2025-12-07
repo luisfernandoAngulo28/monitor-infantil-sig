@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import '../services/websocket_service.dart';
 import '../models/posicion_gps.dart';
 import '../utils/gps_utils.dart';

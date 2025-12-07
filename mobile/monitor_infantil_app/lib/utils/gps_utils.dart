@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:latlong2/latlong.dart';
 
 /// Utilidades para manejo de GPS y cálculos geográficos.
 class GpsUtils {
