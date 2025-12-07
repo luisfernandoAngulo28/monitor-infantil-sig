@@ -45,7 +45,7 @@ class _MapaRealTimeScreenState extends State<MapaRealTimeScreen> {
     // Solo conectar si el usuario está autenticado
     if (authProvider.isAuthenticated && authProvider.tutorId != null && authProvider.token != null) {
       gpsProvider.connect(
-        serverUrl: 'ws://143.198.30.170:8000',
+        serverUrl: 'https://monitor-infantil.duckdns.org', // HTTPS → WSS automático
         tutorId: authProvider.tutorId!,
         authToken: authProvider.token,
       );

@@ -8,7 +8,8 @@ class AuthService {
     BaseOptions(
       connectTimeout: ApiConfig.connectTimeout,
       receiveTimeout: ApiConfig.receiveTimeout,
-      validateStatus: (status) => status! < 500, // Aceptar todos los códigos < 500
+      // Removido validateStatus para que use el comportamiento por defecto
+      // (solo acepta 200-299 como válidos)
     ),
   );
   

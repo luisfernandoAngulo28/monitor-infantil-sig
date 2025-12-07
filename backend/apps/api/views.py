@@ -271,6 +271,113 @@ class ConfiguracionViewSet(viewsets.ViewSet):
             return Response([], status=status.HTTP_200_OK)
 
 
+class BusquedaCercanosViewSet(viewsets.ViewSet):
+    """
+    Endpoint de ingesta para datos GPS desde dispositivos chinos (GF21)
+    POST /api/ingesta/gps-chino/
+    
+    Payload esperado:
+    {
+        "device_id": "862104056214397",  # IMEI del GPS
+        "lat": -17.7833,
+        "lon": -63.1812,
+        "satellites": 5,
+        "battery": 85,
+        "altitude": 420.5,  # Opcional
+        "speed": 0.0        # Opcional
+    }
+    
+    Lógica de Semáforo (Calidad de Señal):
+    - satellites >= 3: Señal GPS fuerte → precisión = 10.0 metros
+    - satellites < 3:  Señal LBS/Interior → precisión = 200.0 metros
+    """
+    serializer = IngestaGPSChinoSerializer(data=request.data)
+    
+    if not serializer.is_valid():
+        return Response(
+            {
+                'error': 'Datos inválidos',
+                'detalles': serializer.errors
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    data = serializer.validated_data
+    device_id = data['device_id']
+    lat = data['lat']
+    lon = data['lon']
+    satellites = data.get('satellites', 0)
+    battery = data.get('battery')
+    altitude = data.get('altitude')
+    speed = data.get('speed')
+    
+    # Buscar niño por dispositivo_id (IMEI)
+    try:
+        nino = Nino.objects.get(dispositivo_id=device_id, activo=True)
+    except Nino.DoesNotExist:
+        return Response(
+            {
+                'error': 'Dispositivo no encontrado',
+                'mensaje': f'No existe ningún niño registrado con dispositivo_id: {device_id}'
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    # Verificar que el tracking esté activo
+    if not nino.tracking_activo:
+        return Response(
+            {
+                'error': 'Tracking desactivado',
+                'mensaje': f'El tracking para {nino.nombre_completo()} está desactivado'
+            },
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    # LÓGICA DE SEMÁFORO: Calidad de señal GPS
+    if satellites >= 3:
+        # Señal GPS fuerte (3+ satélites)
+        precision_metros = 10.0
+    else:
+        # Señal débil o LBS (< 3 satélites)
+        precision_metros = 200.0
+    
+    # Crear punto geográfico (IMPORTANTE: PostGIS usa lon, lat)
+    punto_gps = Point(lon, lat, srid=4326)
+    
+    # Crear registro de posición GPS
+    posicion = PosicionGPS.objects.create(
+        nino=nino,
+        ubicacion=punto_gps,
+        precision_metros=precision_metros,
+        nivel_bateria=battery,
+        altitud=altitude,
+        velocidad_kmh=speed,
+        timestamp=timezone.now()
+    )
+    
+    # Serializar respuesta
+    response_data = {
+        'success': True,
+        'mensaje': 'Posición GPS registrada exitosamente',
+        'nino': {
+            'id': nino.id,
+            'nombre': nino.nombre_completo(),
+            'centro_educativo': nino.centro_educativo.nombre
+        },
+        'posicion': {
+            'id': posicion.id,
+            'lat': lat,
+            'lon': lon,
+            'precision_metros': precision_metros,
+            'satellites': satellites,
+            'dentro_area_segura': posicion.dentro_area_segura,
+            'timestamp': posicion.timestamp.isoformat()
+        }
+    }
+    
+    return Response(response_data, status=status.HTTP_201_CREATED)
+
+
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])  # Permite acceso sin autenticación para dispositivos IoT
 def ingesta_gps_chino(request):
@@ -378,3 +485,149 @@ def ingesta_gps_chino(request):
     }
     
     return Response(response_data, status=status.HTTP_201_CREATED)
+
+
+class BusquedaCercanosViewSet(viewsets.ViewSet):
+    """
+    API para búsqueda espacial de niños cercanos
+    GET /api/busqueda-cercanos/ninos-cercanos/{lat}/{lng}/?radius=1000
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    
+    @action(detail=False, methods=['get'], url_path='ninos-cercanos/(?P<lat>[-\d.]+)/(?P<lng>[-\d.]+)')
+    def ninos_cercanos(self, request, lat=None, lng=None):
+        """
+        Busca niños cercanos a una ubicación específica usando ST_Distance_Sphere
+        
+        Parámetros:
+        - lat: Latitud del centro de búsqueda
+        - lng: Longitud del centro de búsqueda  
+        - radius: Radio de búsqueda en metros (query param, default 500m)
+        
+        Ejemplo:
+        GET /api/busqueda-cercanos/ninos-cercanos/-17.7833/-63.1821/?radius=1000
+        """
+        from django.db import connection
+        import re
+        
+        try:
+            # Validar y convertir parámetros
+            lat = float(lat)
+            lng = float(lng)
+            radius = int(request.query_params.get('radius', 500))
+            
+            # Validar rangos
+            if not (-90 <= lat <= 90) or not (-180 <= lng <= 180):
+                return Response(
+                    {'error': 'Coordenadas inválidas'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            if radius < 10 or radius > 50000:  # Entre 10m y 50km
+                return Response(
+                    {'error': 'Radio debe estar entre 10 y 50000 metros'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Query espacial con ST_Distance usando geography para metros
+            query = """
+                SELECT
+                    n.id,
+                    n.nombre,
+                    n.apellido_paterno,
+                    n.apellido_materno,
+                    ST_AsText(p.ubicacion) AS ubicacion,
+                    ST_Distance(
+                        p.ubicacion::geography, 
+                        ST_GeomFromText('POINT(%s %s)', 4326)::geography
+                    ) AS distancia_metros,
+                    p.timestamp,
+                    p.dentro_area_segura,
+                    p.velocidad,
+                    p.precision,
+                    ce.nombre AS kinder_nombre,
+                    ce.direccion AS kinder_direccion
+                FROM
+                    gis_tracking_nino n
+                INNER JOIN
+                    gis_tracking_posiciongps p ON n.id = p.nino_id
+                INNER JOIN
+                    gis_tracking_centroeducativo ce ON n.centro_educativo_id = ce.id
+                WHERE
+                    n.activo = TRUE
+                    AND p.timestamp = (
+                        SELECT MAX(timestamp) 
+                        FROM gis_tracking_posiciongps 
+                        WHERE nino_id = n.id
+                    )
+                    AND ST_Distance(
+                        p.ubicacion::geography, 
+                        ST_GeomFromText('POINT(%s %s)', 4326)::geography
+                    ) <= %s
+                ORDER BY
+                    distancia_metros ASC
+            """
+            
+            with connection.cursor() as cursor:
+                cursor.execute(query, [lng, lat, lng, lat, radius])
+                rows = cursor.fetchall()
+            
+            # Procesar resultados
+            ninos_cercanos = []
+            for row in rows:
+                # Parsear geometría POINT(lng lat)
+                position_text = row[4]
+                match = re.match(r'POINT\(([-\d.]+) ([-\d.]+)\)', position_text)
+                
+                if match:
+                    lng_nino = float(match.group(1))
+                    lat_nino = float(match.group(2))
+                    
+                    # Construir nombre completo
+                    apellido_completo = f"{row[2]} {row[3]}".strip() if row[3] else row[2]
+                    
+                    ninos_cercanos.append({
+                        'id': row[0],
+                        'nombre': row[1],
+                        'apellido_paterno': row[2],
+                        'apellido_materno': row[3] or '',
+                        'nombre_completo': f"{row[1]} {apellido_completo}",
+                        'posicion': {
+                            'lat': lat_nino,
+                            'lng': lng_nino
+                        },
+                        'distancia_metros': round(row[5], 2),
+                        'distancia_km': round(row[5] / 1000, 3),
+                        'ultima_actualizacion': row[6].isoformat() if row[6] else None,
+                        'dentro_area_segura': row[7],
+                        'velocidad_kmh': round(row[8], 1) if row[8] else 0,
+                        'precision_metros': round(row[9], 1) if row[9] else None,
+                        'kinder': {
+                            'nombre': row[10],
+                            'direccion': row[11]
+                        },
+                        'estado': '🟢 Seguro' if row[7] else '🔴 Fuera del área',
+                        'estado_color': 'green' if row[7] else 'red'
+                    })
+            
+            return Response({
+                'centro_busqueda': {
+                    'lat': lat,
+                    'lng': lng
+                },
+                'radio_metros': radius,
+                'total_encontrados': len(ninos_cercanos),
+                'ninos': ninos_cercanos
+            }, status=status.HTTP_200_OK)
+            
+        except ValueError as e:
+            return Response(
+                {'error': f'Parámetros inválidos: {str(e)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                {'error': f'Error en la búsqueda: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+>>>>>>> origin/main

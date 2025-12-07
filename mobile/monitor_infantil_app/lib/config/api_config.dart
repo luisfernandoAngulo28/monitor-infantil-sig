@@ -2,7 +2,10 @@ class ApiConfig {
   // Configuración del backend
   // Cambiar según tu entorno
   
-  // PRODUCCIÓN - DigitalOcean
+  // PRODUCCIÓN - DigitalOcean con HTTPS
+  // static const String baseUrl = 'https://monitor-infantil.duckdns.org';
+  
+  // PRODUCCIÓN - IP directa (sin SSL)
   // static const String baseUrl = 'http://143.198.30.170:8000';
   
   // Android Emulator (desarrollo local) - Usar 10.0.2.2 para acceder a localhost

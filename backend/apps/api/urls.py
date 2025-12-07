@@ -15,6 +15,7 @@ from .views import (
     MisAlertasViewSet,
     ConfiguracionViewSet,
     ingesta_gps_chino,
+    BusquedaCercanosViewSet,
 )
 
 app_name = 'api'
@@ -27,6 +28,7 @@ router.register(r'posiciones', PosicionGPSViewSet, basename='posicion')
 router.register(r'alertas', AlertaViewSet, basename='alerta')
 router.register(r'mis-alertas', MisAlertasViewSet, basename='mis-alertas')
 router.register(r'configuracion', ConfiguracionViewSet, basename='configuracion')
+router.register(r'busqueda-cercanos', BusquedaCercanosViewSet, basename='busqueda-cercanos')
 
 urlpatterns = [
     # JWT Authentication
