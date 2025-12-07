@@ -3,6 +3,7 @@ import '../config/api_config.dart';
 import '../models/nino.dart';
 import '../models/posicion_gps.dart';
 import '../models/alerta.dart';
+import '../models/nino_cercano.dart';
 import 'auth_service.dart';
 
 class ApiService {
@@ -123,6 +124,24 @@ class ApiService {
       );
     } catch (e) {
       print('Error al actualizar token Firebase: $e');
+      rethrow;
+    }
+  }
+
+  /// Buscar niños cercanos a una ubicación
+  Future<BusquedaCercanosResponse> buscarNinosCercanos({
+    required double lat,
+    required double lng,
+    int radiusMetros = 5000,
+  }) async {
+    try {
+      final response = await _dio.get(
+        '/busqueda-cercanos/ninos-cercanos/$lat/$lng/',
+        queryParameters: {'radius': radiusMetros},
+      );
+      return BusquedaCercanosResponse.fromJson(response.data);
+    } catch (e) {
+      print('Error al buscar niños cercanos: $e');
       rethrow;
     }
   }
