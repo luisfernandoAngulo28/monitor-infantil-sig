@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>MANUAL_USUARIO</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.0/github-markdown.min.css" />
+</head>
+<body>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#manual-de-usuario---monitor-infantil-sig"
+id="toc-manual-de-usuario---monitor-infantil-sig">Manual de Usuario -
+Monitor Infantil SIG</a>
+<ul>
+<li><a href="#tabla-de-contenidos" id="toc-tabla-de-contenidos">Tabla de
+Contenidos</a></li>
+<li><a href="#introducción" id="toc-introducción">1. Introducción</a>
+<ul>
+<li><a href="#qué-es-monitor-infantil-sig"
+id="toc-qué-es-monitor-infantil-sig">¿Qué es Monitor Infantil
+SIG?</a></li>
+<li><a href="#para-qué-sirve" id="toc-para-qué-sirve">¿Para qué
+sirve?</a></li>
+<li><a href="#beneficios" id="toc-beneficios">Beneficios</a></li>
+</ul></li>
+<li><a href="#requisitos-del-sistema" id="toc-requisitos-del-sistema">2.
+Requisitos del Sistema</a>
+<ul>
+<li><a href="#dispositivo-del-tutor-madrepadre"
+id="toc-dispositivo-del-tutor-madrepadre">Dispositivo del Tutor
+(Madre/Padre)</a></li>
+<li><a href="#dispositivo-del-niño"
+id="toc-dispositivo-del-niño">Dispositivo del Niño</a></li>
+<li><a href="#conexión-a-internet" id="toc-conexión-a-internet">Conexión
+a Internet</a></li>
+</ul></li>
+<li><a href="#instalación-de-la-aplicación-móvil"
+id="toc-instalación-de-la-aplicación-móvil">3. Instalación de la
+Aplicación Móvil</a>
+<ul>
+<li><a href="#android" id="toc-android">Android</a></li>
+<li><a href="#ios" id="toc-ios">iOS</a></li>
+<li><a href="#permisos-necesarios" id="toc-permisos-necesarios">Permisos
+Necesarios</a></li>
+</ul></li>
+<li><a href="#registro-e-inicio-de-sesión"
+id="toc-registro-e-inicio-de-sesión">4. Registro e Inicio de Sesión</a>
+<ul>
+<li><a href="#primer-uso-registro" id="toc-primer-uso-registro">Primer
+Uso: Registro</a></li>
+<li><a href="#iniciar-sesión" id="toc-iniciar-sesión">Iniciar
+Sesión</a></li>
+<li><a href="#recuperar-contraseña"
+id="toc-recuperar-contraseña">Recuperar Contraseña</a></li>
+</ul></li>
+<li><a href="#pantalla-principal" id="toc-pantalla-principal">5.
+Pantalla Principal</a>
+<ul>
+<li><a href="#elementos-de-la-interfaz"
+id="toc-elementos-de-la-interfaz">Elementos de la Interfaz</a></li>
+<li><a href="#barra-superior" id="toc-barra-superior">Barra
+Superior</a></li>
+<li><a href="#indicador-de-conexión"
+id="toc-indicador-de-conexión">Indicador de Conexión</a></li>
+</ul></li>
+<li><a href="#monitoreo-en-tiempo-real"
+id="toc-monitoreo-en-tiempo-real">6. Monitoreo en Tiempo Real</a>
+<ul>
+<li><a href="#ver-ubicación-del-niño"
+id="toc-ver-ubicación-del-niño">Ver Ubicación del Niño</a></li>
+<li><a href="#información-del-marcador"
+id="toc-información-del-marcador">Información del Marcador</a></li>
+<li><a href="#centrar-mapa" id="toc-centrar-mapa">Centrar Mapa</a></li>
+<li><a href="#zoom-del-mapa" id="toc-zoom-del-mapa">Zoom del
+Mapa</a></li>
+</ul></li>
+<li><a href="#gestión-de-niños" id="toc-gestión-de-niños">7. Gestión de
+Niños</a>
+<ul>
+<li><a href="#ver-lista-de-niños" id="toc-ver-lista-de-niños">Ver Lista
+de Niños</a></li>
+<li><a href="#agregar-un-niño" id="toc-agregar-un-niño">Agregar un
+Niño</a></li>
+<li><a href="#editar-información-del-niño"
+id="toc-editar-información-del-niño">Editar Información del
+Niño</a></li>
+<li><a href="#desactivar-tracking"
+id="toc-desactivar-tracking">Desactivar Tracking</a></li>
+</ul></li>
+<li><a href="#sistema-de-alertas" id="toc-sistema-de-alertas">8. Sistema
+de Alertas</a>
+<ul>
+<li><a href="#tipos-de-alertas" id="toc-tipos-de-alertas">Tipos de
+Alertas</a></li>
+<li><a href="#ver-alertas" id="toc-ver-alertas">Ver Alertas</a></li>
+<li><a href="#responder-a-una-alerta"
+id="toc-responder-a-una-alerta">Responder a una Alerta</a></li>
+</ul></li>
+<li><a href="#áreas-seguras" id="toc-áreas-seguras">9. Áreas Seguras</a>
+<ul>
+<li><a href="#qué-son-las-áreas-seguras"
+id="toc-qué-son-las-áreas-seguras">¿Qué son las Áreas Seguras?</a></li>
+<li><a href="#ver-áreas-seguras" id="toc-ver-áreas-seguras">Ver Áreas
+Seguras</a></li>
+<li><a href="#crear-área-segura-función-administrativa"
+id="toc-crear-área-segura-función-administrativa">Crear Área Segura
+(Función Administrativa)</a></li>
+<li><a href="#margen-de-tolerancia" id="toc-margen-de-tolerancia">Margen
+de Tolerancia</a></li>
+</ul></li>
+<li><a href="#historial-de-ubicaciones"
+id="toc-historial-de-ubicaciones">10. Historial de Ubicaciones</a>
+<ul>
+<li><a href="#acceder-al-historial"
+id="toc-acceder-al-historial">Acceder al Historial</a></li>
+<li><a href="#visualización-del-historial"
+id="toc-visualización-del-historial">Visualización del
+Historial</a></li>
+<li><a href="#exportar-historial" id="toc-exportar-historial">Exportar
+Historial</a></li>
+</ul></li>
+<li><a href="#configuración" id="toc-configuración">11.
+Configuración</a>
+<ul>
+<li><a href="#acceder-a-configuración"
+id="toc-acceder-a-configuración">Acceder a Configuración</a></li>
+<li><a href="#opciones-disponibles"
+id="toc-opciones-disponibles">Opciones Disponibles</a></li>
+</ul></li>
+<li><a href="#solución-de-problemas" id="toc-solución-de-problemas">12.
+Solución de Problemas</a>
+<ul>
+<li><a href="#problema-1-no-veo-la-ubicación-del-niño"
+id="toc-problema-1-no-veo-la-ubicación-del-niño">Problema 1: No veo la
+ubicación del niño</a></li>
+<li><a href="#problema-2-no-recibo-alertas"
+id="toc-problema-2-no-recibo-alertas">Problema 2: No recibo
+alertas</a></li>
+<li><a href="#problema-3-la-app-se-cierra-sola"
+id="toc-problema-3-la-app-se-cierra-sola">Problema 3: La app se cierra
+sola</a></li>
+<li><a href="#problema-4-el-mapa-no-carga"
+id="toc-problema-4-el-mapa-no-carga">Problema 4: El mapa no
+carga</a></li>
+<li><a href="#problema-5-gps-impreciso"
+id="toc-problema-5-gps-impreciso">Problema 5: GPS impreciso</a></li>
+</ul></li>
+<li><a href="#preguntas-frecuentes" id="toc-preguntas-frecuentes">13.
+Preguntas Frecuentes</a>
+<ul>
+<li><a href="#cuántos-niños-puedo-monitorear"
+id="toc-cuántos-niños-puedo-monitorear">¿Cuántos niños puedo
+monitorear?</a></li>
+<li><a href="#funciona-sin-internet"
+id="toc-funciona-sin-internet">¿Funciona sin Internet?</a></li>
+<li><a href="#cuánto-consume-de-batería"
+id="toc-cuánto-consume-de-batería">¿Cuánto consume de batería?</a></li>
+<li><a href="#es-segura-mi-información"
+id="toc-es-segura-mi-información">¿Es segura mi información?</a></li>
+<li><a href="#puedo-tener-varios-tutores-por-niño"
+id="toc-puedo-tener-varios-tutores-por-niño">¿Puedo tener varios tutores
+por niño?</a></li>
+<li><a href="#qué-pasa-si-el-niño-apaga-el-gps"
+id="toc-qué-pasa-si-el-niño-apaga-el-gps">¿Qué pasa si el niño apaga el
+GPS?</a></li>
+<li><a href="#funciona-fuera-de-bolivia"
+id="toc-funciona-fuera-de-bolivia">¿Funciona fuera de Bolivia?</a></li>
+<li><a href="#cuánto-cuesta" id="toc-cuánto-cuesta">¿Cuánto
+cuesta?</a></li>
+</ul></li>
+<li><a href="#soporte-técnico" id="toc-soporte-técnico">14. Soporte
+Técnico</a>
+<ul>
+<li><a href="#contacto" id="toc-contacto">Contacto</a></li>
+<li><a href="#recursos-adicionales"
+id="toc-recursos-adicionales">Recursos Adicionales</a></li>
+<li><a href="#actualizaciones"
+id="toc-actualizaciones">Actualizaciones</a></li>
+</ul></li>
+<li><a href="#glosario-de-términos"
+id="toc-glosario-de-términos">Glosario de Términos</a></li>
+<li><a href="#capturas-de-pantalla"
+id="toc-capturas-de-pantalla">Capturas de Pantalla</a></li>
+<li><a href="#notas-finales" id="toc-notas-finales">Notas Finales</a>
+<ul>
+<li><a href="#recomendaciones-de-uso"
+id="toc-recomendaciones-de-uso">Recomendaciones de Uso</a></li>
+<li><a href="#privacidad" id="toc-privacidad">Privacidad</a></li>
+<li><a href="#limitaciones" id="toc-limitaciones">Limitaciones</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="manual-de-usuario---monitor-infantil-sig">Manual de Usuario -
+Monitor Infantil SIG</h1>
+<p><strong>Sistema de Monitoreo Infantil con Geolocalización en Tiempo
+Real</strong></p>
+<hr />
+<p><strong>Versión</strong>: 1.0<br />
+<strong>Fecha</strong>: 6 de diciembre de 2025<br />
+<strong>Proyecto</strong>: Monitor Infantil SIG<br />
+<strong>Materia</strong>: INF442-SA<br />
+<strong>Desarrollador</strong>: Fernando Angulo<br />
+<strong>Servidor</strong>: https://monitor-infantil.duckdns.org</p>
+<hr />
+<h2 id="tabla-de-contenidos">Tabla de Contenidos</h2>
+<ol type="1">
+<li><a href="#introducción">Introducción</a></li>
+<li><a href="#requisitos-del-sistema">Requisitos del Sistema</a></li>
+<li><a href="#instalación-de-la-aplicación-móvil">Instalación de la
+Aplicación Móvil</a></li>
+<li><a href="#registro-e-inicio-de-sesión">Registro e Inicio de
+Sesión</a></li>
+<li><a href="#pantalla-principal">Pantalla Principal</a></li>
+<li><a href="#monitoreo-en-tiempo-real">Monitoreo en Tiempo
+Real</a></li>
+<li><a href="#gestión-de-niños">Gestión de Niños</a></li>
+<li><a href="#sistema-de-alertas">Sistema de Alertas</a></li>
+<li><a href="#áreas-seguras">Áreas Seguras</a></li>
+<li><a href="#historial-de-ubicaciones">Historial de
+Ubicaciones</a></li>
+<li><a href="#configuración">Configuración</a></li>
+<li><a href="#solución-de-problemas">Solución de Problemas</a></li>
+<li><a href="#preguntas-frecuentes">Preguntas Frecuentes</a></li>
+<li><a href="#soporte-técnico">Soporte Técnico</a></li>
+</ol>
+<hr />
+<h2 id="introducción">1. Introducción</h2>
+<h3 id="qué-es-monitor-infantil-sig">¿Qué es Monitor Infantil SIG?</h3>
+<p>Monitor Infantil SIG es una aplicación móvil que permite a madres,
+padres y tutores monitorear la ubicación en tiempo real de niños
+preescolares mediante tecnología GPS y Sistemas de Información
+Geográfica (SIG).</p>
+<h3 id="para-qué-sirve">¿Para qué sirve?</h3>
+<ul>
+<li>📍 <strong>Rastreo GPS en Tiempo Real</strong>: Ver la ubicación
+actual del niño en un mapa</li>
+<li>⚠️ <strong>Alertas Automáticas</strong>: Recibir notificaciones
+cuando el niño sale de áreas seguras (Kinder, casa, etc.)</li>
+<li>🗺️ <strong>Áreas Seguras</strong>: Definir zonas geográficas donde
+el niño debe permanecer</li>
+<li>📊 <strong>Historial</strong>: Revisar trayectorias y movimientos
+pasados</li>
+<li>🔋 <strong>Monitoreo de Batería</strong>: Control del nivel de
+batería del dispositivo del niño</li>
+</ul>
+<h3 id="beneficios">Beneficios</h3>
+<p>✅ <strong>Seguridad</strong>: Prevención de pérdidas, accidentes o
+situaciones de riesgo<br />
+✅ <strong>Tranquilidad</strong>: Saber en todo momento dónde está el
+niño<br />
+✅ <strong>Rapidez</strong>: Respuesta inmediata ante situaciones
+anormales<br />
+✅ <strong>Automatización</strong>: Sistema que trabaja 24/7 sin
+intervención manual</p>
+<hr />
+<h2 id="requisitos-del-sistema">2. Requisitos del Sistema</h2>
+<h3 id="dispositivo-del-tutor-madrepadre">Dispositivo del Tutor
+(Madre/Padre)</h3>
+<p><strong>Smartphone con:</strong> - Android 8.0 (Oreo) o superior -
+iOS 12 o superior - Conexión a Internet (WiFi o datos móviles) - GPS
+activado - Mínimo 100 MB de espacio libre</p>
+<p><strong>Recomendado:</strong> - Android 10+ o iOS 14+ - 4G/5G para
+actualizaciones rápidas - Notificaciones push habilitadas</p>
+<h3 id="dispositivo-del-niño">Dispositivo del Niño</h3>
+<p><strong>Opciones:</strong> 1. <strong>Smartwatch con GPS</strong>
+(Recomendado) - Ejemplo: Xiaomi Mi Watch, Apple Watch, Samsung Galaxy
+Watch - Con conectividad celular o WiFi</p>
+<ol start="2" type="1">
+<li><strong>Teléfono básico con GPS</strong>
+<ul>
+<li>Android básico con app instalada</li>
+<li>Plan de datos prepago</li>
+</ul></li>
+<li><strong>Rastreador GPS dedicado</strong>
+<ul>
+<li>Dispositivo GPS con SIM card</li>
+</ul></li>
+</ol>
+<h3 id="conexión-a-internet">Conexión a Internet</h3>
+<ul>
+<li><strong>WiFi</strong> o <strong>datos móviles</strong> activos en
+ambos dispositivos</li>
+<li>Velocidad mínima: 512 Kbps (suficiente para enviar coordenadas
+GPS)</li>
+</ul>
+<hr />
+<h2 id="instalación-de-la-aplicación-móvil">3. Instalación de la
+Aplicación Móvil</h2>
+<h3 id="android">Android</h3>
+<h4 id="opción-a-google-play-store-cuando-esté-publicada">Opción A:
+Google Play Store (Cuando esté publicada)</h4>
+<ol type="1">
+<li>Abre <strong>Google Play Store</strong></li>
+<li>Busca “Monitor Infantil SIG”</li>
+<li>Toca <strong>Instalar</strong></li>
+<li>Espera a que descargue e instale</li>
+<li>Toca <strong>Abrir</strong></li>
+</ol>
+<h4 id="opción-b-apk-directo-versión-de-prueba">Opción B: APK Directo
+(Versión de prueba)</h4>
+<ol type="1">
+<li>Descarga el archivo <code>monitor-infantil.apk</code> desde el
+enlace proporcionado</li>
+<li>Ve a <strong>Configuración</strong> →
+<strong>Seguridad</strong></li>
+<li>Activa <strong>“Permitir instalación de aplicaciones de origen
+desconocido”</strong></li>
+<li>Abre el archivo <code>.apk</code> descargado</li>
+<li>Toca <strong>Instalar</strong></li>
+<li>Toca <strong>Abrir</strong> cuando finalice</li>
+</ol>
+<h3 id="ios">iOS</h3>
+<h4 id="app-store-cuando-esté-publicada">App Store (Cuando esté
+publicada)</h4>
+<ol type="1">
+<li>Abre <strong>App Store</strong></li>
+<li>Busca “Monitor Infantil SIG”</li>
+<li>Toca <strong>Obtener</strong></li>
+<li>Ingresa tu contraseña de Apple ID si se solicita</li>
+<li>Toca <strong>Abrir</strong></li>
+</ol>
+<h3 id="permisos-necesarios">Permisos Necesarios</h3>
+<p>Al abrir la app por primera vez, solicitará los siguientes
+permisos:</p>
+<ul>
+<li>✅ <strong>Ubicación</strong>: Requerido para mostrar tu posición y
+la del niño</li>
+<li>✅ <strong>Notificaciones</strong>: Para recibir alertas de
+seguridad</li>
+<li>📷 <strong>Cámara</strong> (opcional): Para tomar fotos de
+perfil</li>
+<li>📁 <strong>Almacenamiento</strong> (opcional): Para guardar
+historial offline</li>
+</ul>
+<p><strong>⚠️ Importante</strong>: Debes aceptar todos los permisos para
+que la app funcione correctamente.</p>
+<hr />
+<h2 id="registro-e-inicio-de-sesión">4. Registro e Inicio de Sesión</h2>
+<h3 id="primer-uso-registro">Primer Uso: Registro</h3>
+<ol type="1">
+<li><p><strong>Abre la aplicación</strong></p></li>
+<li><p>Toca <strong>“Registrarse”</strong> o <strong>“Crear
+cuenta”</strong></p></li>
+<li><p>Completa el formulario:</p>
+<pre><code>📧 Email: tuCorreo@ejemplo.com
+🔑 Contraseña: (mínimo 8 caracteres)
+🔑 Confirmar contraseña: (repetir)
+👤 Nombre: María
+👤 Apellidos: González López
+📞 Teléfono: +591 70123456
+👨‍👩‍👧 Relación: Madre / Padre / Tutor / Otro
+🆔 CI/DNI: 1234567 (opcional)</code></pre></li>
+<li><p>Toca <strong>“Registrarse”</strong></p></li>
+<li><p>Espera el mensaje: <strong>“Cuenta creada
+exitosamente”</strong></p></li>
+<li><p>Serás redirigido al inicio de sesión</p></li>
+</ol>
+<h3 id="iniciar-sesión">Iniciar Sesión</h3>
+<ol type="1">
+<li>Ingresa tu <strong>email</strong> y <strong>contraseña</strong></li>
+<li>Toca <strong>“Iniciar sesión”</strong></li>
+<li>Serás redirigido a la <strong>pantalla principal</strong></li>
+</ol>
+<h3 id="recuperar-contraseña">Recuperar Contraseña</h3>
+<p>Si olvidaste tu contraseña:</p>
+<ol type="1">
+<li>Toca <strong>“¿Olvidaste tu contraseña?”</strong></li>
+<li>Ingresa tu email</li>
+<li>Recibirás un correo con instrucciones</li>
+<li>Sigue el enlace y crea una nueva contraseña</li>
+</ol>
+<hr />
+<h2 id="pantalla-principal">5. Pantalla Principal</h2>
+<p>Al iniciar sesión verás la <strong>pantalla principal</strong>
+con:</p>
+<h3 id="elementos-de-la-interfaz">Elementos de la Interfaz</h3>
+<pre><code>┌─────────────────────────────────┐
+│  👤 Perfil    🔔 Alertas    ⚙️   │
+├─────────────────────────────────┤
+│                                 │
+│         🗺️ MAPA                 │
+│      (Vista principal)          │
+│                                 │
+│   📍 Niños en el mapa           │
+│   🟢 Verde = En área segura     │
+│   🔴 Rojo = Fuera del área      │
+│                                 │
+├─────────────────────────────────┤
+│  👶 Mis Niños                   │
+│  ├─ Juan (8 años) 🟢           │
+│  └─ María (6 años) 🟢          │
+├─────────────────────────────────┤
+│  [Ver Historial] [Configurar]   │
+└─────────────────────────────────┘</code></pre>
+<h3 id="barra-superior">Barra Superior</h3>
+<ul>
+<li><strong>👤 Perfil</strong>: Ver y editar tu información
+personal</li>
+<li><strong>🔔 Alertas</strong>: Notificaciones recientes (número rojo
+indica alertas sin leer)</li>
+<li><strong>⚙️ Configuración</strong>: Ajustes de la aplicación</li>
+</ul>
+<h3 id="indicador-de-conexión">Indicador de Conexión</h3>
+<p>En la esquina superior derecha verás:</p>
+<ul>
+<li><strong>🟢 En línea</strong>: Conexión activa con el servidor</li>
+<li><strong>🔴 Desconectado</strong>: Sin conexión (verifica tu
+internet)</li>
+</ul>
+<hr />
+<h2 id="monitoreo-en-tiempo-real">6. Monitoreo en Tiempo Real</h2>
+<h3 id="ver-ubicación-del-niño">Ver Ubicación del Niño</h3>
+<ol type="1">
+<li>En la pantalla principal, verás el <strong>mapa</strong> con
+marcadores de tus niños</li>
+<li>Cada niño aparece con un <strong>pin de color</strong>:
+<ul>
+<li>🟢 <strong>Verde</strong>: El niño está <strong>dentro</strong> del
+área segura</li>
+<li>🔴 <strong>Rojo</strong>: El niño está <strong>fuera</strong> del
+área segura (¡ALERTA!)</li>
+</ul></li>
+</ol>
+<h3 id="información-del-marcador">Información del Marcador</h3>
+<p>Toca un <strong>marcador</strong> en el mapa para ver:</p>
+<pre><code>┌─────────────────────────┐
+│ 👶 Juan Pérez López     │
+├─────────────────────────┤
+│ 📍 Ubicación:           │
+│    -17.7833, -63.1812   │
+│                         │
+│ ✅ Estado:              │
+│    En área segura       │
+│                         │
+│ 🔋 Batería: 85%         │
+│                         │
+│ 🕐 Actualización:       │
+│    Hace 10 segundos     │
+│                         │
+│ [Ver más detalles]      │
+└─────────────────────────┘</code></pre>
+<h3 id="centrar-mapa">Centrar Mapa</h3>
+<ul>
+<li>Toca el botón <strong>🎯</strong> (ubicación) en la esquina inferior
+derecha</li>
+<li>El mapa se centrará en el primer niño de tu lista</li>
+</ul>
+<h3 id="zoom-del-mapa">Zoom del Mapa</h3>
+<ul>
+<li><strong>Pellizca</strong> con dos dedos para hacer zoom in/out</li>
+<li><strong>Doble toque</strong> para acercarte rápidamente</li>
+</ul>
+<hr />
+<h2 id="gestión-de-niños">7. Gestión de Niños</h2>
+<h3 id="ver-lista-de-niños">Ver Lista de Niños</h3>
+<ol type="1">
+<li>Desde el menú principal, toca <strong>“Mis Niños”</strong></li>
+<li>Verás la lista de niños que tienes registrados:</li>
+</ol>
+<pre><code>┌─────────────────────────────────┐
+│  👶 Mis Niños (2)               │
+├─────────────────────────────────┤
+│  👦 Juan Pérez López            │
+│  📅 8 años                      │
+│  🏫 Kinder Los Pitufos          │
+│  📍 Estado: 🟢 En área segura   │
+│  🔋 Batería: 85%                │
+│  [Ver en mapa] [Detalles]       │
+├─────────────────────────────────┤
+│  👧 María González              │
+│  📅 6 años                      │
+│  🏫 Rayito de Sol               │
+│  📍 Estado: 🟢 En área segura   │
+│  🔋 Batería: 92%                │
+│  [Ver en mapa] [Detalles]       │
+└─────────────────────────────────┘</code></pre>
+<h3 id="agregar-un-niño">Agregar un Niño</h3>
+<ol type="1">
+<li><p>Toca el botón <strong>“+”</strong> o <strong>“Agregar
+niño”</strong></p></li>
+<li><p>Completa el formulario:</p>
+<pre><code>📝 Nombre: Juan
+📝 Apellido Paterno: Pérez
+📝 Apellido Materno: López (opcional)
+📅 Fecha de Nacimiento: 15/03/2018
+🚻 Sexo: Masculino / Femenino
+📸 Foto: [Tomar foto] [Galería] (opcional)
+🏫 Centro Educativo: Seleccionar...
+📱 ID Dispositivo: 123456789 (código del GPS/smartwatch)
+✅ Tracking Activo: Sí/No</code></pre></li>
+<li><p>Toca <strong>“Guardar”</strong></p></li>
+</ol>
+<h3 id="editar-información-del-niño">Editar Información del Niño</h3>
+<ol type="1">
+<li>En la lista de niños, toca <strong>“Detalles”</strong></li>
+<li>Toca el ícono de <strong>lápiz</strong> ✏️</li>
+<li>Modifica los datos necesarios</li>
+<li>Toca <strong>“Guardar cambios”</strong></li>
+</ol>
+<h3 id="desactivar-tracking">Desactivar Tracking</h3>
+<p>Si temporalmente no quieres monitorear a un niño:</p>
+<ol type="1">
+<li>Entra a <strong>Detalles</strong> del niño</li>
+<li>Desactiva el switch <strong>“Tracking Activo”</strong></li>
+<li>El niño seguirá registrado pero no aparecerá en el mapa</li>
+</ol>
+<hr />
+<h2 id="sistema-de-alertas">8. Sistema de Alertas</h2>
+<h3 id="tipos-de-alertas">Tipos de Alertas</h3>
+<h4 id="alerta-de-salida-de-área">🔴 Alerta de Salida de Área</h4>
+<p><strong>¿Cuándo se genera?</strong> - Cuando el niño sale del área
+segura definida (ej: polígono del kinder)</p>
+<p><strong>¿Qué recibes?</strong> - ⚠️ Notificación push en tu celular -
+📱 Alerta en la app con sonido - 📧 Email (si está configurado)</p>
+<p><strong>Ejemplo de notificación:</strong></p>
+<pre><code>⚠️ ALERTA DE SEGURIDAD
+
+Juan Pérez López ha salido del área segura
+
+🏫 Kinder: Los Pitufos
+📍 Ubicación actual: -17.7900, -63.1900
+🕐 Hora: 10:35 AM
+🔋 Batería: 65%
+
+[Ver en mapa] [Contactar centro]</code></pre>
+<h4 id="alerta-de-batería-baja">🟡 Alerta de Batería Baja</h4>
+<p><strong>¿Cuándo se genera?</strong> - Cuando la batería del
+dispositivo del niño está por debajo del 20%</p>
+<p><strong>Mensaje:</strong></p>
+<pre><code>🔋 Batería Baja
+
+El dispositivo de Juan tiene 15% de batería
+
+⚠️ Recargue pronto para no perder el rastreo</code></pre>
+<h3 id="ver-alertas">Ver Alertas</h3>
+<ol type="1">
+<li>Toca el ícono <strong>🔔</strong> en la barra superior</li>
+<li>Verás la lista de alertas:</li>
+</ol>
+<pre><code>┌─────────────────────────────────┐
+│  🔔 Alertas (3)                 │
+├─────────────────────────────────┤
+│  🔴 NUEVA - Hace 5 min          │
+│  Juan salió del área segura     │
+│  Kinder Los Pitufos             │
+│  [Ver ubicación]                │
+├─────────────────────────────────┤
+│  🟡 Hace 1 hora                 │
+│  Batería baja - María (18%)     │
+│  [Marcar como leída]            │
+├─────────────────────────────────┤
+│  ✅ RESUELTA - Hace 2 horas     │
+│  Juan volvió al área segura     │
+│  [Ver detalles]                 │
+└─────────────────────────────────┘</code></pre>
+<h3 id="responder-a-una-alerta">Responder a una Alerta</h3>
+<p>Cuando recibes una alerta de salida de área:</p>
+<ol type="1">
+<li><strong>VER UBICACIÓN</strong>:
+<ul>
+<li>Toca la alerta</li>
+<li>Se abrirá el mapa mostrando dónde está el niño</li>
+</ul></li>
+<li><strong>CONTACTAR AL CENTRO EDUCATIVO</strong>:
+<ul>
+<li>Llama al teléfono del kinder (aparece en la alerta)</li>
+</ul></li>
+<li><strong>MARCAR COMO LEÍDA</strong>:
+<ul>
+<li>Toca <strong>“Marcar como leída”</strong> cuando hayas revisado</li>
+</ul></li>
+<li><strong>RESOLVER ALERTA</strong>:
+<ul>
+<li>Cuando el niño regrese al área segura, la alerta se marcará
+automáticamente como <strong>“Resuelta”</strong></li>
+</ul></li>
+</ol>
+<hr />
+<h2 id="áreas-seguras">9. Áreas Seguras</h2>
+<h3 id="qué-son-las-áreas-seguras">¿Qué son las Áreas Seguras?</h3>
+<p>Son <strong>polígonos geográficos</strong> que definen zonas donde el
+niño debe permanecer. Por ejemplo: - 🏫 Centro educativo (Kinder) - 🏠
+Casa - 🏞️ Parque - 👵 Casa de los abuelos</p>
+<h3 id="ver-áreas-seguras">Ver Áreas Seguras</h3>
+<ol type="1">
+<li>En el mapa, las áreas seguras aparecen como <strong>zonas
+sombreadas</strong></li>
+<li>Diferentes colores indican diferentes tipos de áreas</li>
+</ol>
+<h3 id="crear-área-segura-función-administrativa">Crear Área Segura
+(Función Administrativa)</h3>
+<p><strong>Nota</strong>: Esta función está disponible solo para
+administradores en el panel web.</p>
+<p><strong>Para administradores:</strong> 1. Accede a:
+https://monitor-infantil.duckdns.org/admin/ 2. Ve a <strong>Centros
+Educativos</strong> → <strong>Añadir</strong> 3. Completa los datos y
+dibuja el polígono en el mapa 4. Guarda</p>
+<h3 id="margen-de-tolerancia">Margen de Tolerancia</h3>
+<p>Cada área segura tiene un <strong>margen de tolerancia</strong> (ej:
+15 metros). Esto significa: - Si el niño está a 10 metros fuera del
+polígono, <strong>NO se genera alerta</strong> - Si está a 20 metros
+fuera, <strong>SÍ se genera alerta</strong></p>
+<p>Esto evita <strong>falsas alarmas</strong> por imprecisiones del
+GPS.</p>
+<hr />
+<h2 id="historial-de-ubicaciones">10. Historial de Ubicaciones</h2>
+<h3 id="acceder-al-historial">Acceder al Historial</h3>
+<ol type="1">
+<li>Selecciona un niño de tu lista</li>
+<li>Toca <strong>“Ver historial”</strong></li>
+<li>Selecciona el período de tiempo:
+<ul>
+<li>Último día</li>
+<li>Última semana</li>
+<li>Último mes</li>
+<li>Personalizado (selecciona fechas)</li>
+</ul></li>
+</ol>
+<h3 id="visualización-del-historial">Visualización del Historial</h3>
+<pre><code>┌─────────────────────────────────┐
+│  📊 Historial - Juan Pérez      │
+│  📅 6 de diciembre 2025         │
+├─────────────────────────────────┤
+│  🗺️ Mapa con trayectoria        │
+│  (línea que conecta puntos GPS) │
+│                                 │
+│  ─── Ruta del niño ───          │
+│                                 │
+├─────────────────────────────────┤
+│  📋 Lista de ubicaciones:       │
+│                                 │
+│  10:35 AM - En Kinder 🟢        │
+│  📍 -17.7750, -63.1810          │
+│                                 │
+│  09:15 AM - Llegó al Kinder 🟢  │
+│  📍 -17.7752, -63.1812          │
+│                                 │
+│  08:30 AM - Salió de casa 🏠    │
+│  📍 -17.7800, -63.1850          │
+└─────────────────────────────────┘</code></pre>
+<h3 id="exportar-historial">Exportar Historial</h3>
+<ol type="1">
+<li>En la pantalla de historial, toca <strong>⋮</strong> (menú)</li>
+<li>Selecciona <strong>“Exportar”</strong></li>
+<li>Elige formato:
+<ul>
+<li>PDF (reporte)</li>
+<li>CSV (datos)</li>
+<li>KML (para Google Earth)</li>
+</ul></li>
+</ol>
+<hr />
+<h2 id="configuración">11. Configuración</h2>
+<h3 id="acceder-a-configuración">Acceder a Configuración</h3>
+<p>Toca el ícono <strong>⚙️</strong> en la barra superior.</p>
+<h3 id="opciones-disponibles">Opciones Disponibles</h3>
+<h4 id="notificaciones">🔔 Notificaciones</h4>
+<pre><code>✅ Alertas de salida de área
+✅ Alertas de batería baja
+✅ Sonido de notificación
+✅ Vibración
+□ Modo No Molestar (horarios)</code></pre>
+<h4 id="mapa">🗺️ Mapa</h4>
+<pre><code>Tipo de mapa:
+○ Estándar (por defecto)
+○ Satélite
+○ Terreno
+○ Híbrido
+
+Zoom automático: ✅
+Mostrar mi ubicación: ✅</code></pre>
+<h4 id="actualizaciones-gps">⏱️ Actualizaciones GPS</h4>
+<pre><code>Frecuencia de actualización:
+○ 10 segundos (consume más batería)
+○ 30 segundos (recomendado)
+○ 1 minuto (ahorra batería)</code></pre>
+<h4 id="seguridad">🔐 Seguridad</h4>
+<pre><code>✅ Requerir contraseña al abrir
+□ Huella digital / Face ID
+□ Bloqueo automático (5 min)</code></pre>
+<h4 id="contactos-de-emergencia">📞 Contactos de Emergencia</h4>
+<p>Agrega números de teléfono para llamar rápidamente:</p>
+<pre><code>+ Agregar contacto
+  └─ Policía: 110
+  └─ Kinder: 3-3334455
+  └─ Papá: 70999888</code></pre>
+<hr />
+<h2 id="solución-de-problemas">12. Solución de Problemas</h2>
+<h3 id="problema-1-no-veo-la-ubicación-del-niño">Problema 1: No veo la
+ubicación del niño</h3>
+<p><strong>Posibles causas y soluciones:</strong></p>
+<p>✅ <strong>Verifica conexión a Internet</strong> - Asegúrate de tener
+WiFi o datos móviles activos - Prueba abrir un navegador web</p>
+<p>✅ <strong>Verifica permisos de ubicación</strong> - Ve a
+Configuración del teléfono → Aplicaciones → Monitor Infantil - Permisos
+→ Ubicación → <strong>“Permitir todo el tiempo”</strong></p>
+<p>✅ <strong>Verifica que el dispositivo del niño esté
+encendido</strong> - El smartwatch o GPS debe estar activo - Debe tener
+batería suficiente</p>
+<p>✅ <strong>Verifica el indicador de conexión</strong> - Si dice
+“Desconectado”, cierra y abre la app</p>
+<h3 id="problema-2-no-recibo-alertas">Problema 2: No recibo alertas</h3>
+<p><strong>Soluciones:</strong></p>
+<p>✅ <strong>Verifica permisos de notificaciones</strong> -
+Configuración → Aplicaciones → Monitor Infantil → Notificaciones →
+<strong>Activadas</strong></p>
+<p>✅ <strong>Verifica configuración en la app</strong> - Configuración
+→ Notificaciones → <strong>Alertas activadas</strong></p>
+<p>✅ <strong>Verifica que el niño tenga tracking activo</strong> - Mis
+Niños → Detalles del niño → <strong>Tracking Activo: Sí</strong></p>
+<h3 id="problema-3-la-app-se-cierra-sola">Problema 3: La app se cierra
+sola</h3>
+<p><strong>Soluciones:</strong></p>
+<p>✅ <strong>Actualiza la aplicación</strong> - Ve a Play Store y busca
+actualizaciones</p>
+<p>✅ <strong>Borra caché de la app</strong> - Configuración →
+Aplicaciones → Monitor Infantil → Almacenamiento → <strong>Borrar
+caché</strong></p>
+<p>✅ <strong>Reinstala la app</strong> - Desinstala y vuelve a instalar
+(tus datos se mantendrán en el servidor)</p>
+<h3 id="problema-4-el-mapa-no-carga">Problema 4: El mapa no carga</h3>
+<p><strong>Soluciones:</strong></p>
+<p>✅ <strong>Verifica conexión a Internet</strong></p>
+<p>✅ <strong>Verifica permisos de ubicación</strong></p>
+<p>✅ <strong>Reinicia la app</strong> - Cierra completamente y vuelve a
+abrir</p>
+<p>✅ <strong>Borra datos de la app</strong> (último recurso) -
+Configuración → Aplicaciones → Monitor Infantil → Almacenamiento →
+<strong>Borrar datos</strong> - Tendrás que iniciar sesión
+nuevamente</p>
+<h3 id="problema-5-gps-impreciso">Problema 5: GPS impreciso</h3>
+<p><strong>Causas comunes:</strong></p>
+<ul>
+<li>📡 Mala señal GPS (dentro de edificios)</li>
+<li>🌧️ Clima adverso</li>
+<li>🏢 Zonas urbanas densas con edificios altos</li>
+</ul>
+<p><strong>Soluciones:</strong></p>
+<p>✅ Espera unos segundos a que el GPS se estabilice ✅ Asegúrate de
+estar en un lugar con cielo despejado ✅ Verifica que el GPS del
+dispositivo esté activado</p>
+<hr />
+<h2 id="preguntas-frecuentes">13. Preguntas Frecuentes</h2>
+<h3 id="cuántos-niños-puedo-monitorear">¿Cuántos niños puedo
+monitorear?</h3>
+<p>No hay límite. Puedes agregar tantos niños como necesites.</p>
+<h3 id="funciona-sin-internet">¿Funciona sin Internet?</h3>
+<p>No. La app requiere conexión a Internet para enviar/recibir
+ubicaciones en tiempo real.</p>
+<h3 id="cuánto-consume-de-batería">¿Cuánto consume de batería?</h3>
+<p>Con actualizaciones cada 30 segundos, consume aproximadamente: -
+<strong>Tutor</strong>: 5-10% más de batería por hora -
+<strong>Niño</strong> (dispositivo GPS): 15-20% por hora</p>
+<h3 id="es-segura-mi-información">¿Es segura mi información?</h3>
+<p>Sí. Todos los datos están: - 🔒 Encriptados con HTTPS/SSL - 🔐
+Protegidos con autenticación - 🛡️ Almacenados en servidores seguros</p>
+<h3 id="puedo-tener-varios-tutores-por-niño">¿Puedo tener varios tutores
+por niño?</h3>
+<p>Sí. Un niño puede tener un <strong>tutor principal</strong> y
+<strong>tutores adicionales</strong> (papá, mamá, abuelos, etc.). Todos
+recibirán las alertas.</p>
+<h3 id="qué-pasa-si-el-niño-apaga-el-gps">¿Qué pasa si el niño apaga el
+GPS?</h3>
+<ul>
+<li>Se dejará de recibir actualizaciones</li>
+<li>La última ubicación conocida permanecerá visible</li>
+<li>Recibirás una alerta de <strong>“Sin señal GPS”</strong></li>
+</ul>
+<h3 id="funciona-fuera-de-bolivia">¿Funciona fuera de Bolivia?</h3>
+<p>Sí. El sistema funciona en cualquier lugar del mundo que tenga
+cobertura GPS e Internet.</p>
+<h3 id="cuánto-cuesta">¿Cuánto cuesta?</h3>
+<p><strong>Versión académica</strong>: Gratuita para pruebas del
+proyecto universitario.</p>
+<hr />
+<h2 id="soporte-técnico">14. Soporte Técnico</h2>
+<h3 id="contacto">Contacto</h3>
+<p><strong>Email</strong>: fernando.fa671@gmail.com<br />
+<strong>Teléfono</strong>: [Tu número]<br />
+<strong>Horario</strong>: Lunes a Viernes, 9:00 AM - 6:00 PM</p>
+<h3 id="recursos-adicionales">Recursos Adicionales</h3>
+<ul>
+<li>📖 <strong>Documentación técnica</strong>: <a
+href="https://github.com/luisfernandoAngulo28/monitor-infantil-sig">PROYECTO_RESUMEN.md</a></li>
+<li>🌐 <strong>Panel administrativo</strong>:
+https://monitor-infantil.duckdns.org/admin/</li>
+<li>🐛 <strong>Reportar errores</strong>: Crea un issue en GitHub</li>
+</ul>
+<h3 id="actualizaciones">Actualizaciones</h3>
+<p>La aplicación se actualiza automáticamente cuando: - Hay nuevas
+funcionalidades - Se corrigen errores - Se mejora el rendimiento</p>
+<p>Recibirás una notificación cuando haya actualizaciones
+disponibles.</p>
+<hr />
+<h2 id="glosario-de-términos">Glosario de Términos</h2>
+<ul>
+<li><strong>GPS</strong>: Sistema de Posicionamiento Global (satélites
+que detectan ubicación)</li>
+<li><strong>SIG</strong>: Sistema de Información Geográfica (análisis
+espacial con mapas)</li>
+<li><strong>Área Segura</strong>: Zona geográfica donde el niño debe
+permanecer</li>
+<li><strong>Polígono</strong>: Forma geométrica cerrada que delimita un
+área en el mapa</li>
+<li><strong>Tracking</strong>: Rastreo o seguimiento de la
+ubicación</li>
+<li><strong>WebSocket</strong>: Tecnología para comunicación en tiempo
+real</li>
+<li><strong>SSL/HTTPS</strong>: Protocolo de seguridad para encriptar
+datos</li>
+</ul>
+<hr />
+<h2 id="capturas-de-pantalla">Capturas de Pantalla</h2>
+<p><em>(Para la versión PDF, incluir capturas de pantalla aquí)</em></p>
+<ol type="1">
+<li><strong>Pantalla de Login</strong></li>
+<li><strong>Mapa Principal con marcadores</strong></li>
+<li><strong>Detalle de niño</strong></li>
+<li><strong>Lista de alertas</strong></li>
+<li><strong>Configuración</strong></li>
+<li><strong>Historial de ubicaciones</strong></li>
+</ol>
+<hr />
+<h2 id="notas-finales">Notas Finales</h2>
+<h3 id="recomendaciones-de-uso">Recomendaciones de Uso</h3>
+<p>✅ <strong>Mantén la app actualizada</strong> siempre a la última
+versión<br />
+✅ <strong>Verifica permisos</strong> después de actualizaciones del
+sistema operativo<br />
+✅ <strong>Carga el dispositivo del niño</strong> cada noche<br />
+✅ <strong>Revisa alertas</strong> al menos 2-3 veces al día<br />
+✅ <strong>Prueba el sistema</strong> antes del primer día de clases</p>
+<h3 id="privacidad">Privacidad</h3>
+<ul>
+<li>Solo <strong>tú</strong> (y otros tutores autorizados) pueden ver la
+ubicación del niño</li>
+<li>Los datos <strong>no se comparten</strong> con terceros</li>
+<li>Puedes <strong>eliminar tu cuenta</strong> en cualquier momento
+desde Configuración</li>
+</ul>
+<h3 id="limitaciones">Limitaciones</h3>
+<ul>
+<li>Requiere que el dispositivo del niño tenga GPS y conectividad</li>
+<li>La precisión del GPS puede variar (±5-15 metros)</li>
+<li>En interiores la señal GPS puede ser débil</li>
+</ul>
+<hr />
+<p><strong>© 2025 Monitor Infantil SIG - Proyecto Académico
+INF442-SA</strong><br />
+<strong>Universidad</strong>: [Tu Universidad]<br />
+<strong>Docente</strong>: Ing. Franklin Calderón Flores</p>
+</body>
+</html>
