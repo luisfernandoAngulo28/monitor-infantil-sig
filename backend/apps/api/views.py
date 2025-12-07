@@ -312,7 +312,7 @@ class BusquedaCercanosViewSet(viewsets.ViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            # Query espacial con ST_Distance_Sphere
+            # Query espacial con ST_Distance usando geography para metros
             query = """
                 SELECT
                     n.id,
@@ -320,9 +320,9 @@ class BusquedaCercanosViewSet(viewsets.ViewSet):
                     n.apellido_paterno,
                     n.apellido_materno,
                     ST_AsText(p.ubicacion) AS ubicacion,
-                    ST_Distance_Sphere(
-                        p.ubicacion, 
-                        ST_GeomFromText('POINT(%s %s)', 4326)
+                    ST_Distance(
+                        p.ubicacion::geography, 
+                        ST_GeomFromText('POINT(%s %s)', 4326)::geography
                     ) AS distancia_metros,
                     p.timestamp,
                     p.dentro_area_segura,
@@ -343,9 +343,9 @@ class BusquedaCercanosViewSet(viewsets.ViewSet):
                         FROM gis_tracking_posiciongps 
                         WHERE nino_id = n.id
                     )
-                    AND ST_Distance_Sphere(
-                        p.ubicacion, 
-                        ST_GeomFromText('POINT(%s %s)', 4326)
+                    AND ST_Distance(
+                        p.ubicacion::geography, 
+                        ST_GeomFromText('POINT(%s %s)', 4326)::geography
                     ) <= %s
                 ORDER BY
                     distancia_metros ASC
