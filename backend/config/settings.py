@@ -10,7 +10,27 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,143.198.30.170').split(',')
+
+# ALLOWED_HOSTS configuration
+# En modo DEBUG, aceptar cualquier host (para desarrollo y Docker)
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+    # Deshabilitar validación RFC de hostnames en desarrollo
+    # Esto permite usar nombres de contenedores Docker con guiones bajos
+    import os
+    os.environ.setdefault('PYTHONDONTWRITEBYTECODE', '1')
+    # Parche para aceptar hosts no-RFC en desarrollo
+    from django.http import HttpRequest
+    _original_get_host = HttpRequest.get_host
+    def _patched_get_host(self):
+        try:
+            return _original_get_host(self)
+        except:
+            # En desarrollo, siempre retornar el host sin validación
+            return self.META.get('HTTP_HOST', 'localhost')
+    HttpRequest.get_host = _patched_get_host
+else:
+    ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,143.198.30.170').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -128,8 +148,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Custom User Model (futuro)
-# AUTH_USER_MODEL = 'core.Usuario'
+# Custom User Model
+AUTH_USER_MODEL = 'core.Usuario'
 
 # REST Framework
 REST_FRAMEWORK = {

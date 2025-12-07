@@ -25,25 +25,64 @@ services:
     networks:
       - monitor_network
 
-  # Django app (descomentar cuando esté listo)
-  # web:
-  #   build: .
-  #   command: python manage.py runserver 0.0.0.0:8000
-  #   volumes:
-  #     - .:/app
-  #   ports:
-  #     - "8000:8000"
-  #   environment:
-  #     - DATABASE_URL=postgis://postgres:postgres123@db:5432/monitor_infantil_db
-  #     - REDIS_URL=redis://redis:6379/0
-  #   depends_on:
-  #     - db
-  #     - redis
-  #   networks:
-  #     - monitor_network
+  # Django app
+  web_backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - DATABASE_NAME=monitor_infantil_db
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres123
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - REDIS_URL=redis://redis:6379/0
+      - ALLOWED_HOSTS=*,.,localhost,127.0.0.1
+    depends_on:
+      - db
+      - redis
+    networks:
+      - monitor_network
+
+  # GPS Tracker Worker - API China (xtgps.top)
+  gps_tracker:
+    build:
+      context: .
+      dockerfile: gps_tracker/Dockerfile
+    container_name: monitor_infantil_gps_tracker
+    restart: always
+    environment:
+      # Cargar variables desde .env
+      - API_URL=${API_URL}
+      - DEVICE_IMEI=${DEVICE_IMEI}
+      - GPS_COOKIE=${GPS_COOKIE}
+      - POLL_INTERVAL=${POLL_INTERVAL:-30}
+    volumes:
+      - ./gps_tracker:/app
+      - gps_logs:/var/log
+    depends_on:
+      - redis
+      # Descomentar cuando web_backend esté activo:
+      # - web_backend
+    networks:
+      - monitor_network
+    # Healthcheck para monitoreo
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 volumes:
   postgres_data:
+  gps_logs:
 
 networks:
   monitor_network:

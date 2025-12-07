@@ -14,6 +14,7 @@ from .views import (
     AlertaViewSet,
     MisAlertasViewSet,
     ConfiguracionViewSet,
+    ingesta_gps_chino,
 )
 
 app_name = 'api'
@@ -31,6 +32,9 @@ urlpatterns = [
     # JWT Authentication
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
+    # GPS Ingestion (IoT Devices)
+    path('ingesta/gps-chino/', ingesta_gps_chino, name='ingesta-gps-chino'),
     
     # API endpoints
     path('', include(router.urls)),

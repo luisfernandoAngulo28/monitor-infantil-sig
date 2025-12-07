@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'package:latlong2/latlong.dart';
 import '../services/websocket_service.dart';
+import '../services/api_service.dart';
 import '../models/posicion_gps.dart';
+import '../models/nino.dart';
 
 /// Provider para manejar el estado de GPS tracking en tiempo real.
 /// 
@@ -11,15 +13,18 @@ import '../models/posicion_gps.dart';
 /// nuevas posiciones GPS.
 class GPSTrackingProvider with ChangeNotifier {
   final WebSocketService _wsService = WebSocketService();
+  final ApiService _apiService = ApiService();
   StreamSubscription<Map<String, dynamic>>? _messageSubscription;
 
   // Estado
   bool _isConnected = false;
+  bool _isLoadingInitialPositions = false;
   Map<int, PosicionGPS> _latestPositions = {};
   List<String> _recentAlerts = [];
 
   // Getters
   bool get isConnected => _isConnected;
+  bool get isLoadingInitialPositions => _isLoadingInitialPositions;
   Map<int, PosicionGPS> get latestPositions => _latestPositions;
   List<String> get recentAlerts => _recentAlerts;
 
@@ -28,15 +33,57 @@ class GPSTrackingProvider with ChangeNotifier {
     return _latestPositions[ninoId];
   }
 
+  /// Cargar posiciones iniciales de todos los niños desde la API REST
+  Future<void> loadInitialPositions() async {
+    try {
+      _isLoadingInitialPositions = true;
+      notifyListeners();
+
+      debugPrint('📥 Cargando posiciones iniciales desde API...');
+
+      // Obtener lista de niños
+      final ninos = await _apiService.getMisNinos();
+      debugPrint('👶 Niños encontrados: ${ninos.length}');
+
+      // Para cada niño, obtener su última posición
+      for (final nino in ninos) {
+        try {
+          final estado = await _apiService.getEstadoNino(nino.id);
+          
+          if (estado.ultimaPosicion != null) {
+            _latestPositions[estado.ninoId] = estado.ultimaPosicion!;
+            debugPrint('📍 Posición inicial cargada - ${estado.ninoNombre}: '
+                '${estado.ultimaPosicion!.ubicacion.latitude}, ${estado.ultimaPosicion!.ubicacion.longitude}');
+          } else {
+            debugPrint('⚠️ ${estado.ninoNombre} no tiene posiciones GPS');
+          }
+        } catch (e) {
+          debugPrint('❌ Error al cargar posición del niño ${nino.id}: $e');
+        }
+      }
+
+      debugPrint('✅ Posiciones iniciales cargadas: ${_latestPositions.length} marcadores');
+
+    } catch (e) {
+      debugPrint('❌ Error al cargar posiciones iniciales: $e');
+    } finally {
+      _isLoadingInitialPositions = false;
+      notifyListeners();
+    }
+  }
+
   /// Conectar al servidor WebSocket
   void connect({
     required String serverUrl,
     required int tutorId,
     String? authToken,
-  }) {
+  }) async {
     debugPrint('🔌 Iniciando conexión WebSocket...');
 
-    // Conectar al servicio
+    // Primero cargar posiciones iniciales desde la API
+    await loadInitialPositions();
+
+    // Luego conectar al servicio WebSocket para actualizaciones en tiempo real
     _wsService.connect(
       serverUrl: serverUrl,
       tutorId: tutorId,

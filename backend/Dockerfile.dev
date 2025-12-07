@@ -1,0 +1,46 @@
+FROM python:3.11-slim
+
+# Variables de entorno
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instalar dependencias del sistema para GeoDjango
+RUN apt-get update && apt-get install -y \
+    binutils \
+    libproj-dev \
+    gdal-bin \
+    libgdal-dev \
+    libgeos-dev \
+    libpq-dev \
+    gcc \
+    g++ \
+    postgresql-client \
+    python3-gdal \
+    && rm -rf /var/lib/apt/lists/*
+
+# Encontrar la ubicación correcta de GDAL
+RUN find /usr -name "libgdal.so*" 2>/dev/null | head -1
+
+# Configurar GDAL con la ruta correcta
+ENV GDAL_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgdal.so
+ENV GEOS_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgeos_c.so
+
+# Directorio de trabajo
+WORKDIR /app
+
+# Copiar requirements
+COPY requirements/ requirements/
+
+# Instalar dependencias de Python
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements/base.txt
+
+# Copiar el proyecto
+COPY . .
+
+# Exponer puerto
+EXPOSE 8000
+
+# Comando por defecto (se puede sobreescribir en docker-compose)
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

@@ -46,7 +46,7 @@ class NinoSerializer(serializers.ModelSerializer):
     centro_educativo = CentroEducativoSimpleSerializer(read_only=True)
     tutor_principal = TutorSerializer(read_only=True)
     edad = serializers.IntegerField(read_only=True)
-    nombre_completo = serializers.CharField(source='nombre_completo', read_only=True)
+    nombre_completo = serializers.CharField(read_only=True)
     
     class Meta:
         model = Nino
@@ -145,3 +145,45 @@ class EstadoNinoSerializer(serializers.Serializer):
 class ActualizarFirebaseTokenSerializer(serializers.Serializer):
     """Serializer para actualizar el token FCM del usuario"""
     firebase_token = serializers.CharField(max_length=255)
+
+
+class IngestaGPSChinoSerializer(serializers.Serializer):
+    """Serializer para ingestar datos de GPS desde dispositivo chino GF21"""
+    device_id = serializers.CharField(
+        max_length=255,
+        help_text='IMEI del dispositivo GPS'
+    )
+    lat = serializers.FloatField(
+        min_value=-90,
+        max_value=90,
+        help_text='Latitud en grados decimales'
+    )
+    lon = serializers.FloatField(
+        min_value=-180,
+        max_value=180,
+        help_text='Longitud en grados decimales'
+    )
+    satellites = serializers.IntegerField(
+        min_value=0,
+        max_value=50,
+        required=False,
+        default=0,
+        help_text='Número de satélites GPS detectados'
+    )
+    battery = serializers.IntegerField(
+        min_value=0,
+        max_value=100,
+        required=False,
+        allow_null=True,
+        help_text='Nivel de batería (0-100%)'
+    )
+    altitude = serializers.FloatField(
+        required=False,
+        allow_null=True,
+        help_text='Altitud en metros'
+    )
+    speed = serializers.FloatField(
+        required=False,
+        allow_null=True,
+        help_text='Velocidad en km/h'
+    )

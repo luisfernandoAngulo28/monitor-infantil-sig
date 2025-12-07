@@ -2,10 +2,11 @@
 ViewSets y vistas de la API REST
 """
 from rest_framework import viewsets, status, permissions
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
+from django.contrib.gis.geos import Point
 from datetime import timedelta
 
 from apps.gis_tracking.models import CentroEducativo, Nino, PosicionGPS
@@ -17,7 +18,7 @@ from .serializers import (
     CentroEducativoSerializer, NinoSerializer, PosicionGPSSerializer,
     PosicionGPSSimpleSerializer, AlertaSerializer, NotificacionTutorSerializer, 
     TutorSerializer, RegistrarPosicionSerializer, EstadoNinoSerializer,
-    ActualizarFirebaseTokenSerializer
+    ActualizarFirebaseTokenSerializer, IngestaGPSChinoSerializer
 )
 
 
@@ -70,10 +71,10 @@ class NinoViewSet(viewsets.ReadOnlyModelViewSet):
             'dentro_area_segura': estado_info.get('dentro_area', None),
             'alertas_activas': alertas_activas,
             'nivel_bateria': estado_info.get('nivel_bateria'),
+            'tracking_activo': nino.tracking_activo,
         }
         
-        serializer = EstadoNinoSerializer(data)
-        return Response(serializer.data)
+        return Response(data)
     
     @action(detail=True, methods=['get'])
     def historial(self, request, pk=None):
@@ -268,3 +269,112 @@ class ConfiguracionViewSet(viewsets.ViewSet):
         
         except Tutor.DoesNotExist:
             return Response([], status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])  # Permite acceso sin autenticación para dispositivos IoT
+def ingesta_gps_chino(request):
+    """
+    Endpoint de ingesta para datos GPS desde dispositivos chinos (GF21)
+    POST /api/ingesta/gps-chino/
+    
+    Payload esperado:
+    {
+        "device_id": "862104056214397",  # IMEI del GPS
+        "lat": -17.7833,
+        "lon": -63.1812,
+        "satellites": 5,
+        "battery": 85,
+        "altitude": 420.5,  # Opcional
+        "speed": 0.0        # Opcional
+    }
+    
+    Lógica de Semáforo (Calidad de Señal):
+    - satellites >= 3: Señal GPS fuerte → precisión = 10.0 metros
+    - satellites < 3:  Señal LBS/Interior → precisión = 200.0 metros
+    """
+    serializer = IngestaGPSChinoSerializer(data=request.data)
+    
+    if not serializer.is_valid():
+        return Response(
+            {
+                'error': 'Datos inválidos',
+                'detalles': serializer.errors
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    data = serializer.validated_data
+    device_id = data['device_id']
+    lat = data['lat']
+    lon = data['lon']
+    satellites = data.get('satellites', 0)
+    battery = data.get('battery')
+    altitude = data.get('altitude')
+    speed = data.get('speed')
+    
+    # Buscar niño por dispositivo_id (IMEI)
+    try:
+        nino = Nino.objects.get(dispositivo_id=device_id, activo=True)
+    except Nino.DoesNotExist:
+        return Response(
+            {
+                'error': 'Dispositivo no encontrado',
+                'mensaje': f'No existe ningún niño registrado con dispositivo_id: {device_id}'
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    # Verificar que el tracking esté activo
+    if not nino.tracking_activo:
+        return Response(
+            {
+                'error': 'Tracking desactivado',
+                'mensaje': f'El tracking para {nino.nombre_completo()} está desactivado'
+            },
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    # LÓGICA DE SEMÁFORO: Calidad de señal GPS
+    if satellites >= 3:
+        # Señal GPS fuerte (3+ satélites)
+        precision_metros = 10.0
+    else:
+        # Señal débil o LBS (< 3 satélites)
+        precision_metros = 200.0
+    
+    # Crear punto geográfico (IMPORTANTE: PostGIS usa lon, lat)
+    punto_gps = Point(lon, lat, srid=4326)
+    
+    # Crear registro de posición GPS
+    posicion = PosicionGPS.objects.create(
+        nino=nino,
+        ubicacion=punto_gps,
+        precision_metros=precision_metros,
+        nivel_bateria=battery,
+        altitud=altitude,
+        velocidad_kmh=speed,
+        timestamp=timezone.now()
+    )
+    
+    # Serializar respuesta
+    response_data = {
+        'success': True,
+        'mensaje': 'Posición GPS registrada exitosamente',
+        'nino': {
+            'id': nino.id,
+            'nombre': nino.nombre_completo(),
+            'centro_educativo': nino.centro_educativo.nombre
+        },
+        'posicion': {
+            'id': posicion.id,
+            'lat': lat,
+            'lon': lon,
+            'precision_metros': precision_metros,
+            'satellites': satellites,
+            'dentro_area_segura': posicion.dentro_area_segura,
+            'timestamp': posicion.timestamp.isoformat()
+        }
+    }
+    
+    return Response(response_data, status=status.HTTP_201_CREATED)
