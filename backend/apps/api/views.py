@@ -317,7 +317,8 @@ class BusquedaCercanosViewSet(viewsets.ViewSet):
                 SELECT
                     n.id,
                     n.nombre,
-                    n.apellido,
+                    n.apellido_paterno,
+                    n.apellido_materno,
                     ST_AsText(p.ubicacion) AS ubicacion,
                     ST_Distance_Sphere(
                         p.ubicacion, 
@@ -358,34 +359,38 @@ class BusquedaCercanosViewSet(viewsets.ViewSet):
             ninos_cercanos = []
             for row in rows:
                 # Parsear geometría POINT(lng lat)
-                position_text = row[3]
+                position_text = row[4]
                 match = re.match(r'POINT\(([-\d.]+) ([-\d.]+)\)', position_text)
                 
                 if match:
                     lng_nino = float(match.group(1))
                     lat_nino = float(match.group(2))
                     
+                    # Construir nombre completo
+                    apellido_completo = f"{row[2]} {row[3]}".strip() if row[3] else row[2]
+                    
                     ninos_cercanos.append({
                         'id': row[0],
                         'nombre': row[1],
-                        'apellido': row[2],
-                        'nombre_completo': f"{row[1]} {row[2]}",
+                        'apellido_paterno': row[2],
+                        'apellido_materno': row[3] or '',
+                        'nombre_completo': f"{row[1]} {apellido_completo}",
                         'posicion': {
                             'lat': lat_nino,
                             'lng': lng_nino
                         },
-                        'distancia_metros': round(row[4], 2),
-                        'distancia_km': round(row[4] / 1000, 3),
-                        'ultima_actualizacion': row[5].isoformat() if row[5] else None,
-                        'dentro_area_segura': row[6],
-                        'velocidad_kmh': round(row[7], 1) if row[7] else 0,
-                        'precision_metros': round(row[8], 1) if row[8] else None,
+                        'distancia_metros': round(row[5], 2),
+                        'distancia_km': round(row[5] / 1000, 3),
+                        'ultima_actualizacion': row[6].isoformat() if row[6] else None,
+                        'dentro_area_segura': row[7],
+                        'velocidad_kmh': round(row[8], 1) if row[8] else 0,
+                        'precision_metros': round(row[9], 1) if row[9] else None,
                         'kinder': {
-                            'nombre': row[9],
-                            'direccion': row[10]
+                            'nombre': row[10],
+                            'direccion': row[11]
                         },
-                        'estado': '🟢 Seguro' if row[6] else '🔴 Fuera del área',
-                        'estado_color': 'green' if row[6] else 'red'
+                        'estado': '🟢 Seguro' if row[7] else '🔴 Fuera del área',
+                        'estado_color': 'green' if row[7] else 'red'
                     })
             
             return Response({
