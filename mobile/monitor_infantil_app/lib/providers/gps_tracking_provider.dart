@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'dart:async';
-import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 import '../services/websocket_service.dart';
 import '../models/posicion_gps.dart';
+import '../utils/gps_utils.dart';
 
 /// Provider para manejar el estado de GPS tracking en tiempo real.
 /// 
@@ -12,18 +13,86 @@ import '../models/posicion_gps.dart';
 class GPSTrackingProvider with ChangeNotifier {
   final WebSocketService _wsService = WebSocketService();
   StreamSubscription<Map<String, dynamic>>? _messageSubscription;
+  StreamSubscription<Position>? _gpsStreamSubscription;
 
   // Estado
   bool _isConnected = false;
   Map<int, PosicionGPS> _latestPositions = {};
   List<String> _recentAlerts = [];
+  Position? _currentPosition;
+  bool _isTrackingEnabled = false;
 
   // Getters
   bool get isConnected => _isConnected;
   Map<int, PosicionGPS> get latestPositions => _latestPositions;
   List<String> get recentAlerts => _recentAlerts;
+  Position? get currentPosition => _currentPosition;
+  bool get isTrackingEnabled => _isTrackingEnabled;
 
-  /// Obtener la última posición de un niño específico
+  /// Inicia tracking GPS de alta precisión.
+  /// 
+  /// Envía automáticamente posiciones al servidor vía WebSocket.
+  Future<void> startHighPrecisionTracking(int ninoId) async {
+    // Verificar permisos
+    final permission = await GpsUtils.checkPermission();
+    if (permission == LocationPermission.denied) {
+      await GpsUtils.requestPermission();
+    }
+
+    // Verificar servicio habilitado
+    final enabled = await GpsUtils.isLocationServiceEnabled();
+    if (!enabled) {
+      debugPrint('⚠️ Servicio de ubicación desactivado');
+      return;
+    }
+
+    // Cancelar stream anterior si existe
+    await _gpsStreamSubscription?.cancel();
+
+    // Iniciar stream de alta precisión
+    _gpsStreamSubscription = GpsUtils.getHighPrecisionStream().listen(
+      (Position position) {
+        if (!GpsUtils.isValidPosition(position)) {
+          debugPrint('⚠️ Posición GPS inválida, ignorando');
+          return;
+        }
+
+        _currentPosition = position;
+        debugPrint('📍 GPS actualizado: ${GpsUtils.formatCoordinates(
+          GpsUtils.positionToLatLng(position),
+        )} - Precisión: ${position.accuracy.toStringAsFixed(1)}m');
+
+        // Enviar al servidor vía WebSocket
+        if (_isConnected) {
+          sendGPSUpdate(
+            ninoId: ninoId,
+            lat: position.latitude,
+            lng: position.longitude,
+            nivelBateria: 100, // TODO: Obtener nivel real de batería
+          );
+        }
+
+        notifyListeners();
+      },
+      onError: (error) {
+        debugPrint('❌ Error en stream GPS: $error');
+      },
+    );
+
+    _isTrackingEnabled = true;
+    notifyListeners();
+    debugPrint('✅ Tracking GPS de alta precisión iniciado para niño $ninoId');
+  }
+
+  /// Detiene el tracking GPS.
+  Future<void> stopTracking() async {
+    await _gpsStreamSubscription?.cancel();
+    _gpsStreamSubscription = null;
+    _isTrackingEnabled = false;
+    _currentPosition = null;
+    notifyListeners();
+    debugPrint('🛑 Tracking GPS detenido');
+  }
   PosicionGPS? getPositionForNino(int ninoId) {
     return _latestPositions[ninoId];
   }
