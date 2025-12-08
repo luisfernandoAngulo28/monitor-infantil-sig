@@ -149,12 +149,14 @@ INSERT INTO core_usuario (
         sql_tutor = f"""
 -- Tutor {i}: {nombre} {apellido}
 INSERT INTO core_tutor (
-    usuario_id, relacion, ci, telefono_emergencia
+    usuario_id, relacion, ci, telefono_emergencia, fecha_registro, activo
 ) VALUES (
     (SELECT id FROM core_usuario WHERE username = '{username}'),
     '{relacion}',
     '{ci}',
-    '{telefono_emergencia}'
+    '{telefono_emergencia}',
+    NOW(),
+    true
 );"""
         
         sql_statements.append(sql_usuario)
