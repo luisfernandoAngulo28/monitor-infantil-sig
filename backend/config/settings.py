@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,143.198.30.170').split(',')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,143.198.30.170,monitor-infantil.duckdns.org').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -128,7 +128,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Custom User Model (futuro)
+# Custom User Model (comentado temporalmente por problemas de migración)
 # AUTH_USER_MODEL = 'core.Usuario'
 
 # REST Framework
@@ -172,3 +172,11 @@ FIREBASE_CREDENTIALS_PATH = config('FIREBASE_CREDENTIALS_PATH', default='')
 # Tracking settings
 GPS_UPDATE_INTERVAL_SECONDS = 30  # Actualización GPS cada 30 segundos
 ALERT_COOLDOWN_MINUTES = 5  # No enviar alertas repetidas en 5 minutos
+
+# CSRF Configuration for HTTPS
+CSRF_TRUSTED_ORIGINS = [
+    'https://monitor-infantil.duckdns.org',
+    'http://143.198.30.170:8000',
+]
+CSRF_COOKIE_SECURE = False  # True en producción con HTTPS certificado
+SESSION_COOKIE_SECURE = False  # True en producción con HTTPS certificado
