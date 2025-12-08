@@ -63,6 +63,19 @@ class CentroEducativo {
   });
 
   factory CentroEducativo.fromJson(Map<String, dynamic> json) {
+    // Manejar formato GeoJSON Feature si viene del endpoint de centros
+    if (json['type'] == 'Feature' && json['properties'] != null) {
+      final props = json['properties'];
+      return CentroEducativo(
+        id: json['id'],
+        nombre: props['nombre'],
+        codigo: props['codigo'],
+        direccion: props['direccion'],
+        telefono: props['telefono'],
+      );
+    }
+    
+    // Formato simple cuando viene anidado en niño
     return CentroEducativo(
       id: json['id'],
       nombre: json['nombre'],

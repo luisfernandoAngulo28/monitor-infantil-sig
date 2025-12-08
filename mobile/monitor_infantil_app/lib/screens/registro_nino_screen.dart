@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../services/api_service.dart';
+import '../models/nino.dart';
 
 /// Pantalla para registrar un nuevo niño y vincular su dispositivo GPS.
 /// 
@@ -31,7 +32,15 @@ class _RegistroNinoScreenState extends State<RegistroNinoScreen> {
   String _sexo = 'M';
   bool _trackingActivo = true;
   bool _isLoading = false;
-  int? _centroEducativoId = 1; // TODO: Cargar desde API
+  int? _centroEducativoId;
+  List<CentroEducativo> _centrosEducativos = [];
+  bool _loadingCentros = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarCentrosEducativos();
+  }
 
   @override
   void dispose() {
@@ -41,6 +50,32 @@ class _RegistroNinoScreenState extends State<RegistroNinoScreen> {
     _dispositivoIdController.dispose();
     _fechaNacimientoController.dispose();
     super.dispose();
+  }
+
+  Future<void> _cargarCentrosEducativos() async {
+    try {
+      final centros = await _apiService.obtenerCentrosEducativos();
+      setState(() {
+        _centrosEducativos = centros;
+        _loadingCentros = false;
+        // Seleccionar el primer centro por defecto si hay alguno
+        if (centros.isNotEmpty) {
+          _centroEducativoId = centros.first.id;
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _loadingCentros = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al cargar centros educativos: $e'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _seleccionarFecha() async {
@@ -282,6 +317,37 @@ class _RegistroNinoScreenState extends State<RegistroNinoScreen> {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Centro Educativo
+                    DropdownButtonFormField<int>(
+                      value: _centroEducativoId,
+                      decoration: const InputDecoration(
+                        labelText: 'Kinder/Colegio (Opcional)',
+                        prefixIcon: Icon(Icons.school),
+                        border: OutlineInputBorder(),
+                        helperText: 'Área segura para notificaciones',
+                      ),
+                      items: _loadingCentros
+                          ? []
+                          : [
+                              const DropdownMenuItem<int>(
+                                value: null,
+                                child: Text('Sin asignar'),
+                              ),
+                              ..._centrosEducativos.map((centro) {
+                                return DropdownMenuItem<int>(
+                                  value: centro.id,
+                                  child: Text(centro.nombre ?? 'Centro ${centro.id}'),
+                                );
+                              }),
+                            ],
+                      onChanged: (value) {
+                        setState(() {
+                          _centroEducativoId = value;
+                        });
+                      },
                     ),
                     const SizedBox(height: 24),
 

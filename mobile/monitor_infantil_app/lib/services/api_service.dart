@@ -193,4 +193,21 @@ class ApiService {
       rethrow;
     }
   }
+
+  /// Obtener lista de centros educativos
+  Future<List<CentroEducativo>> obtenerCentrosEducativos() async {
+    try {
+      final response = await _dio.get(ApiConfig.centrosUrl);
+      
+      // El API retorna formato paginado: {count, next, previous, results: {type: "FeatureCollection", features: [...]}}
+      final Map<String, dynamic> paginatedData = response.data;
+      final Map<String, dynamic> resultsData = paginatedData['results'];
+      final List<dynamic> features = resultsData['features'];
+      
+      return features.map((featureJson) => CentroEducativo.fromJson(featureJson)).toList();
+    } catch (e) {
+      print('Error al obtener centros educativos: $e');
+      rethrow;
+    }
+  }
 }
