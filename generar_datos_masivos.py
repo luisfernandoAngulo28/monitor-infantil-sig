@@ -85,13 +85,11 @@ def generar_sql_kinders():
         sql = f"""
 -- Kinder {i}: {nombre} - {zona['nombre']}
 INSERT INTO gis_tracking_centroeducativo (
-    nombre, codigo, direccion, ciudad, departamento, telefono, email, area_segura, activo
+    nombre, codigo, direccion, telefono, email, area_segura, activo
 ) VALUES (
     '{nombre} - {zona["nombre"]}',
     '{codigo}',
-    '{direccion}',
-    'Santa Cruz de la Sierra',
-    'Santa Cruz',
+    '{direccion}, Santa Cruz de la Sierra',
     '{telefono}',
     '{email}',
     {poligono},
