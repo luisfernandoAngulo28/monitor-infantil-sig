@@ -15,6 +15,7 @@ from .views import (
     MisAlertasViewSet,
     ConfiguracionViewSet,
     ingesta_gps_chino,
+    traccar_webhook,
     BusquedaCercanosViewSet,
 )
 
@@ -37,6 +38,9 @@ urlpatterns = [
     
     # GPS Ingestion (IoT Devices)
     path('ingesta/gps-chino/', ingesta_gps_chino, name='ingesta-gps-chino'),
+    
+    # Traccar GPS Integration
+    path('traccar/webhook/', traccar_webhook, name='traccar-webhook'),
     
     # API endpoints
     path('', include(router.urls)),

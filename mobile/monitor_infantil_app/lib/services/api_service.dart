@@ -126,4 +126,49 @@ class ApiService {
       rethrow;
     }
   }
+
+  // CRUD operations for Nino
+  Future<Nino> crearNino(Map<String, dynamic> ninoData) async {
+    try {
+      final response = await _dio.post(
+        ApiConfig.ninosUrl,
+        data: ninoData,
+      );
+      return Nino.fromJson(response.data);
+    } catch (e) {
+      print('Error al crear niño: $e');
+      rethrow;
+    }
+  }
+
+  Future<Nino> actualizarNino(int ninoId, Map<String, dynamic> ninoData) async {
+    try {
+      final response = await _dio.patch(
+        '${ApiConfig.ninosUrl}$ninoId/',
+        data: ninoData,
+      );
+      return Nino.fromJson(response.data);
+    } catch (e) {
+      print('Error al actualizar niño: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> eliminarNino(int ninoId) async {
+    try {
+      await _dio.delete('${ApiConfig.ninosUrl}$ninoId/');
+    } catch (e) {
+      print('Error al eliminar niño: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> desvincularDispositivo(int ninoId) async {
+    try {
+      await _dio.post('${ApiConfig.ninosUrl}$ninoId/desvincular_dispositivo/');
+    } catch (e) {
+      print('Error al desvincular dispositivo: $e');
+      rethrow;
+    }
+  }
 }

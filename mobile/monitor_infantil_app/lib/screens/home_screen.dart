@@ -6,6 +6,7 @@ import 'mapa_screen.dart';
 import 'mapa_realtime_screen_example.dart';
 import 'alertas_screen.dart';
 import 'login_screen.dart';
+import 'registro_nino_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -77,6 +78,19 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: screens[_currentIndex],
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RegistroNinoScreen(),
+            ),
+          );
+        },
+        icon: const Icon(Icons.person_add),
+        label: const Text('Registrar Niño'),
+        backgroundColor: Theme.of(context).primaryColor,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {

@@ -95,6 +95,9 @@ class WebSocketService {
     String wsUrl = _serverUrl!.replaceFirst('http://', 'ws://');
     wsUrl = wsUrl.replaceFirst('https://', 'wss://');
     
+    // Eliminar cualquier puerto :0 incorrecto
+    wsUrl = wsUrl.replaceAll(':0', '');
+    
     // Agregar ruta del WebSocket
     return '$wsUrl/ws/tracking/tutor/$_tutorId/';
   }

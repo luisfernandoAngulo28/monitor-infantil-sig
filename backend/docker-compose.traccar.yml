@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  traccar:
+    image: traccar/traccar:latest
+    container_name: traccar_server
+    ports:
+      - "8082:8082"  # Web interface & REST API
+      - "5055:5055"  # HTTP protocol for Traccar Client
+      - "5000-5036:5000-5036"  # Additional GPS device protocols (before ADB)
+      - "5038-5100:5038-5100"  # Additional GPS device protocols (after ADB)
+    volumes:
+      - ./traccar/config/traccar-simple.xml:/opt/traccar/conf/traccar.xml:ro
+      - ./traccar/logs:/opt/traccar/logs
+      - traccar_data:/opt/traccar/data
+    environment:
+      - JAVA_OPTS=-Xms512m -Xmx1024m
+    restart: unless-stopped
+    networks:
+      - monitor_network
+
+  # Servicio adicional para inicializar la base de datos de Traccar
+  traccar_db_init:
+    image: postgres:15-alpine
+    container_name: traccar_db_init
+    environment:
+      POSTGRES_HOST: monitor_infantil_db
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    command: >
+      sh -c "
+        apk add --no-cache postgresql-client &&
+        until pg_isready -h monitor_infantil_db -U postgres; do
+          echo 'Esperando PostgreSQL...';
+          sleep 2;
+        done &&
+        psql -h monitor_infantil_db -U postgres -tc \"SELECT 1 FROM pg_database WHERE datname = 'traccar'\" | grep -q 1 || 
+        psql -h monitor_infantil_db -U postgres -c 'CREATE DATABASE traccar;' &&
+        echo 'Base de datos traccar lista'
+      "
+    networks:
+      - monitor_network
+
+volumes:
+  traccar_data:
+    driver: local
+
+networks:
+  monitor_network:
+    external: true

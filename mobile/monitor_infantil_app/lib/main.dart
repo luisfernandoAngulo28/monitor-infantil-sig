@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'providers/auth_provider.dart';
 import 'providers/ninos_provider.dart';
 import 'providers/gps_tracking_provider.dart';
@@ -42,6 +43,16 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Monitor Infantil',
         debugShowCheckedModeBanner: false,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('es', 'ES'), // Español
+          Locale('en', 'US'), // Inglés
+        ],
+        locale: const Locale('es', 'ES'),
         theme: ThemeData(
           primarySwatch: Colors.blue,
           useMaterial3: true,

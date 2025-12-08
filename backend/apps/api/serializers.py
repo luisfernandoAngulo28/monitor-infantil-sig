@@ -187,3 +187,123 @@ class IngestaGPSChinoSerializer(serializers.Serializer):
         allow_null=True,
         help_text='Velocidad en km/h'
     )
+
+
+class CrearNinoSerializer(serializers.ModelSerializer):
+    """Serializer para crear/registrar un nuevo niño con dispositivo GPS"""
+    
+    class Meta:
+        model = Nino
+        fields = ['nombre', 'apellido_paterno', 'apellido_materno', 
+                 'fecha_nacimiento', 'sexo', 'foto', 'centro_educativo',
+                 'dispositivo_id', 'tracking_activo']
+    
+    def validate(self, data):
+        """Validación general con logging"""
+        print(f"🔍 DEBUG CrearNinoSerializer - Datos recibidos: {data}")
+        return super().validate(data)
+    
+    def validate_dispositivo_id(self, value):
+        """Validar que el dispositivo_id no esté ya en uso"""
+        if value:
+            # Verificar si ya existe otro niño con ese dispositivo
+            existing = Nino.objects.filter(
+                dispositivo_id=value,
+                activo=True
+            ).exclude(pk=self.instance.pk if self.instance else None)
+            
+            if existing.exists():
+                raise serializers.ValidationError(
+                    f"El dispositivo {value} ya está asignado a {existing.first().nombre_completo()}"
+                )
+        return value
+    
+    def create(self, validated_data):
+        """Crear niño y vincular con tutor autenticado"""
+        # El tutor_principal se asignará en la vista
+        nino = Nino.objects.create(**validated_data)
+        
+        # Si tiene dispositivo_id, registrar en Traccar
+        if nino.dispositivo_id:
+            from apps.gis_tracking.traccar_service import TraccarService
+            try:
+                traccar = TraccarService()
+                traccar.register_device(
+                    device_id=nino.dispositivo_id,
+                    name=nino.nombre_completo(),
+                    category='person'
+                )
+            except Exception as e:
+                # Log error pero no fallar la creación
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"No se pudo registrar dispositivo en Traccar: {e}")
+        
+        return nino
+
+
+class ActualizarNinoSerializer(serializers.ModelSerializer):
+    """Serializer para actualizar información de un niño"""
+    
+    class Meta:
+        model = Nino
+        fields = ['nombre', 'apellido_paterno', 'apellido_materno',
+                 'fecha_nacimiento', 'sexo', 'foto', 'dispositivo_id',
+                 'tracking_activo']
+    
+    def validate_dispositivo_id(self, value):
+        """Validar que el dispositivo_id no esté ya en uso"""
+        if value:
+            existing = Nino.objects.filter(
+                dispositivo_id=value,
+                activo=True
+            ).exclude(pk=self.instance.pk)
+            
+            if existing.exists():
+                raise serializers.ValidationError(
+                    f"El dispositivo {value} ya está asignado a {existing.first().nombre_completo()}"
+                )
+        return value
+    
+    def update(self, instance, validated_data):
+        """Actualizar niño y sincronizar con Traccar si cambió dispositivo_id"""
+        old_device_id = instance.dispositivo_id
+        new_device_id = validated_data.get('dispositivo_id')
+        
+        # Actualizar campos
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        
+        # Si cambió el dispositivo_id, actualizar Traccar
+        if new_device_id and new_device_id != old_device_id:
+            from apps.gis_tracking.traccar_service import TraccarService
+            try:
+                traccar = TraccarService()
+                
+                # Eliminar dispositivo antiguo si existía
+                if old_device_id:
+                    traccar.delete_device(old_device_id)
+                
+                # Registrar nuevo dispositivo
+                traccar.register_device(
+                    device_id=new_device_id,
+                    name=instance.nombre_completo(),
+                    category='person'
+                )
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Error al actualizar dispositivo en Traccar: {e}")
+        
+        return instance
+
+
+class TraccarWebhookSerializer(serializers.Serializer):
+    """Serializer para webhook de Traccar Server"""
+    position = serializers.DictField(
+        help_text='Datos de posición GPS del dispositivo'
+    )
+    device = serializers.DictField(
+        help_text='Datos del dispositivo que envió la posición'
+    )

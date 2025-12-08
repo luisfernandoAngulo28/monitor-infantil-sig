@@ -229,10 +229,46 @@ class PosicionGPS(models.Model):
         
         super().save(*args, **kwargs)
         
+        # Enviar actualización por WebSocket
+        self._enviar_actualizacion_websocket()
+        
         # Trigger para crear alerta si salió del área
         if not self.dentro_area_segura:
             from apps.alerts.models import Alerta
             Alerta.crear_alerta_salida(self)
+    
+    def _enviar_actualizacion_websocket(self):
+        """Envía la posición GPS a los tutores por WebSocket"""
+        from channels.layers import get_channel_layer
+        from asgiref.sync import async_to_sync
+        
+        channel_layer = get_channel_layer()
+        if not channel_layer:
+            return
+        
+        # Obtener tutor principal
+        tutor_id = self.nino.tutor_principal.id
+        group_name = f'tracking_tutor_{tutor_id}'
+        
+        # Preparar datos para enviar
+        mensaje = {
+            'type': 'gps_update',
+            'nino_id': self.nino.id,
+            'nino_nombre': self.nino.nombre_completo(),
+            'timestamp': self.timestamp.isoformat(),
+            'lat': self.ubicacion.y,
+            'lon': self.ubicacion.x,
+            'precision_metros': float(self.precision_metros) if self.precision_metros else None,
+            'dentro_area_segura': self.dentro_area_segura,
+            'nivel_bateria': self.nivel_bateria,
+        }
+        
+        # Enviar a través de Channels
+        try:
+            async_to_sync(channel_layer.group_send)(group_name, mensaje)
+            print(f'📡 WebSocket enviado a tutor {tutor_id}: GPS de {self.nino.nombre_completo()}')
+        except Exception as e:
+            print(f'❌ Error enviando WebSocket: {e}')
     
     def distancia_al_centro(self):
         """Calcula distancia en metros al centro del kinder"""

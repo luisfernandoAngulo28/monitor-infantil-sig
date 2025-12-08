@@ -11,14 +11,17 @@ from datetime import timedelta
 
 from apps.gis_tracking.models import CentroEducativo, Nino, PosicionGPS
 from apps.gis_tracking.services import TrackingService
+from apps.gis_tracking.traccar_service import TraccarService
 from apps.alerts.models import Alerta, NotificacionTutor
 from apps.core.models import Tutor
+from django.conf import settings
 
 from .serializers import (
     CentroEducativoSerializer, NinoSerializer, PosicionGPSSerializer,
     PosicionGPSSimpleSerializer, AlertaSerializer, NotificacionTutorSerializer, 
     TutorSerializer, RegistrarPosicionSerializer, EstadoNinoSerializer,
-    ActualizarFirebaseTokenSerializer, IngestaGPSChinoSerializer
+    ActualizarFirebaseTokenSerializer, IngestaGPSChinoSerializer,
+    CrearNinoSerializer, ActualizarNinoSerializer, TraccarWebhookSerializer
 )
 
 
@@ -33,22 +36,99 @@ class CentroEducativoViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class NinoViewSet(viewsets.ReadOnlyModelViewSet):
+class NinoViewSet(viewsets.ModelViewSet):
     """
-    API para consultar niños
+    API para gestionar niños (CRUD completo)
     GET /api/ninos/ - Listar
     GET /api/ninos/{id}/ - Detalle
+    POST /api/ninos/ - Registrar nuevo niño
+    PATCH /api/ninos/{id}/ - Actualizar niño
+    DELETE /api/ninos/{id}/ - Eliminar niño (soft delete)
     GET /api/ninos/{id}/estado/ - Estado actual del niño
     GET /api/ninos/{id}/historial/ - Historial de posiciones
     POST /api/ninos/{id}/registrar_posicion/ - Registrar nueva posición GPS
+    POST /api/ninos/{id}/desvincular_dispositivo/ - Desvincular dispositivo GPS
     """
     queryset = Nino.objects.filter(activo=True).select_related(
         'centro_educativo', 'tutor_principal'
     )
     serializer_class = NinoSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]  # Temporalmente permisivo para testing
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['centro_educativo', 'tutor_principal', 'tracking_activo']
+    
+    def get_serializer_class(self):
+        """Usar diferentes serializers según la acción"""
+        if self.action == 'create':
+            return CrearNinoSerializer
+        elif self.action in ['update', 'partial_update']:
+            return ActualizarNinoSerializer
+        return NinoSerializer
+    
+    def create(self, request, *args, **kwargs):
+        """Override create para logging detallado"""
+        print(f"🔍 DEBUG create() - Request data: {request.data}")
+        print(f"🔍 DEBUG create() - User: {request.user}, Authenticated: {request.user.is_authenticated}")
+        print(f"🔍 DEBUG create() - Headers: {dict(request.headers)}")
+        return super().create(request, *args, **kwargs)
+    
+    def get_queryset(self):
+        """Filtrar niños del tutor autenticado"""
+        user = self.request.user
+        
+        # Superusuarios ven todos
+        if user.is_superuser:
+            return Nino.objects.filter(activo=True)
+        
+        # Tutores ven solo sus niños
+        try:
+            tutor = Tutor.objects.get(usuario=user)
+            from django.db.models import Q
+            return Nino.objects.filter(
+                Q(tutor_principal=tutor) | Q(tutores_adicionales=tutor),
+                activo=True
+            ).distinct()
+        except Tutor.DoesNotExist:
+            return Nino.objects.none()
+    
+    def perform_create(self, serializer):
+        """Asignar tutor_principal al crear niño"""
+        user = self.request.user
+        print(f"🔍 DEBUG - Usuario autenticado: {user}, Is authenticated: {user.is_authenticated}")
+        print(f"🔍 DEBUG - Datos recibidos: {self.request.data}")
+        
+        if user.is_authenticated:
+            try:
+                tutor = Tutor.objects.get(usuario=user)
+                print(f"🔍 DEBUG - Tutor encontrado: {tutor.id}")
+                serializer.save(tutor_principal=tutor)
+                return
+            except Tutor.DoesNotExist:
+                print(f"❌ DEBUG - Tutor no existe para usuario: {user.username}")
+        
+        # Si no está autenticado o no tiene tutor, usar el primer tutor disponible (SOLO PARA TESTING)
+        print(f"⚠️ DEBUG - Usando tutor por defecto para testing")
+        tutor_default = Tutor.objects.first()
+        if tutor_default:
+            serializer.save(tutor_principal=tutor_default)
+        else:
+            raise permissions.PermissionDenied("No hay tutores disponibles en el sistema")
+    
+    def perform_destroy(self, instance):
+        """Soft delete - marcar como inactivo"""
+        instance.activo = False
+        instance.tracking_activo = False
+        instance.save()
+        
+        # Si tiene dispositivo, eliminarlo de Traccar
+        if instance.dispositivo_id:
+            try:
+                traccar = TraccarService()
+                traccar.delete_device(instance.dispositivo_id)
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Error al eliminar dispositivo de Traccar: {e}")
     
     @action(detail=True, methods=['get'])
     def estado(self, request, pk=None):
@@ -135,6 +215,44 @@ class NinoViewSet(viewsets.ReadOnlyModelViewSet):
                 {'error': str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+    
+    @action(detail=True, methods=['post'])
+    def desvincular_dispositivo(self, request, pk=None):
+        """
+        Desvincular dispositivo GPS del niño
+        POST /api/ninos/{id}/desvincular_dispositivo/
+        """
+        nino = self.get_object()
+        
+        if not nino.dispositivo_id:
+            return Response(
+                {'mensaje': 'Este niño no tiene dispositivo vinculado'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        old_device_id = nino.dispositivo_id
+        
+        # Eliminar de Traccar
+        try:
+            traccar = TraccarService()
+            traccar.delete_device(old_device_id)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Error al eliminar de Traccar: {e}")
+        
+        # Limpiar dispositivo_id
+        nino.dispositivo_id = None
+        nino.tracking_activo = False
+        nino.save()
+        
+        return Response(
+            {
+                'mensaje': f'Dispositivo {old_device_id} desvinculado exitosamente',
+                'nino': NinoSerializer(nino).data
+            },
+            status=status.HTTP_200_OK
+        )
 
 
 class PosicionGPSViewSet(viewsets.ReadOnlyModelViewSet):
@@ -272,110 +390,8 @@ class ConfiguracionViewSet(viewsets.ViewSet):
 
 
 class BusquedaCercanosViewSet(viewsets.ViewSet):
-    """
-    Endpoint de ingesta para datos GPS desde dispositivos chinos (GF21)
-    POST /api/ingesta/gps-chino/
-    
-    Payload esperado:
-    {
-        "device_id": "862104056214397",  # IMEI del GPS
-        "lat": -17.7833,
-        "lon": -63.1812,
-        "satellites": 5,
-        "battery": 85,
-        "altitude": 420.5,  # Opcional
-        "speed": 0.0        # Opcional
-    }
-    
-    Lógica de Semáforo (Calidad de Señal):
-    - satellites >= 3: Señal GPS fuerte → precisión = 10.0 metros
-    - satellites < 3:  Señal LBS/Interior → precisión = 200.0 metros
-    """
-    serializer = IngestaGPSChinoSerializer(data=request.data)
-    
-    if not serializer.is_valid():
-        return Response(
-            {
-                'error': 'Datos inválidos',
-                'detalles': serializer.errors
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    data = serializer.validated_data
-    device_id = data['device_id']
-    lat = data['lat']
-    lon = data['lon']
-    satellites = data.get('satellites', 0)
-    battery = data.get('battery')
-    altitude = data.get('altitude')
-    speed = data.get('speed')
-    
-    # Buscar niño por dispositivo_id (IMEI)
-    try:
-        nino = Nino.objects.get(dispositivo_id=device_id, activo=True)
-    except Nino.DoesNotExist:
-        return Response(
-            {
-                'error': 'Dispositivo no encontrado',
-                'mensaje': f'No existe ningún niño registrado con dispositivo_id: {device_id}'
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-    
-    # Verificar que el tracking esté activo
-    if not nino.tracking_activo:
-        return Response(
-            {
-                'error': 'Tracking desactivado',
-                'mensaje': f'El tracking para {nino.nombre_completo()} está desactivado'
-            },
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    # LÓGICA DE SEMÁFORO: Calidad de señal GPS
-    if satellites >= 3:
-        # Señal GPS fuerte (3+ satélites)
-        precision_metros = 10.0
-    else:
-        # Señal débil o LBS (< 3 satélites)
-        precision_metros = 200.0
-    
-    # Crear punto geográfico (IMPORTANTE: PostGIS usa lon, lat)
-    punto_gps = Point(lon, lat, srid=4326)
-    
-    # Crear registro de posición GPS
-    posicion = PosicionGPS.objects.create(
-        nino=nino,
-        ubicacion=punto_gps,
-        precision_metros=precision_metros,
-        nivel_bateria=battery,
-        altitud=altitude,
-        velocidad_kmh=speed,
-        timestamp=timezone.now()
-    )
-    
-    # Serializar respuesta
-    response_data = {
-        'success': True,
-        'mensaje': 'Posición GPS registrada exitosamente',
-        'nino': {
-            'id': nino.id,
-            'nombre': nino.nombre_completo(),
-            'centro_educativo': nino.centro_educativo.nombre
-        },
-        'posicion': {
-            'id': posicion.id,
-            'lat': lat,
-            'lon': lon,
-            'precision_metros': precision_metros,
-            'satellites': satellites,
-            'dentro_area_segura': posicion.dentro_area_segura,
-            'timestamp': posicion.timestamp.isoformat()
-        }
-    }
-    
-    return Response(response_data, status=status.HTTP_201_CREATED)
+    """ViewSet para búsquedas de ubicaciones cercanas"""
+    pass
 
 
 @api_view(['POST'])
@@ -630,4 +646,113 @@ class BusquedaCercanosViewSet(viewsets.ViewSet):
                 {'error': f'Error en la búsqueda: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
->>>>>>> origin/main
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def traccar_webhook(request):
+    """
+    Webhook endpoint para recibir actualizaciones de posición desde Traccar Server.
+    POST /api/traccar/webhook/
+    
+    Traccar envía eventos de posición en tiempo real a este endpoint.
+    
+    Payload esperado:
+    {
+        "position": {
+            "id": 12345,
+            "deviceId": 1,
+            "deviceTime": "2025-12-07T10:30:00.000Z",
+            "latitude": -17.7833,
+            "longitude": -63.1812,
+            "speed": 0.0,
+            "altitude": 420.5,
+            "accuracy": 10.0,
+            "attributes": {
+                "batteryLevel": 85.0
+            }
+        },
+        "device": {
+            "id": 1,
+            "uniqueId": "862104056214397",
+            "name": "Juanito Pérez"
+        }
+    }
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    # Verificar token de autorización
+    auth_header = request.headers.get('Authorization', '')
+    expected_token = f"Bearer {settings.TRACCAR_WEBHOOK_SECRET}"
+    
+    if auth_header != expected_token:
+        logger.warning(f"❌ Intento de acceso no autorizado al webhook Traccar")
+        return Response(
+            {'error': 'Unauthorized'},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+    
+    try:
+        serializer = TraccarWebhookSerializer(data=request.data)
+        if not serializer.is_valid():
+            logger.error(f"❌ Datos inválidos en webhook: {serializer.errors}")
+            return Response(
+                {'error': 'Invalid data', 'details': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        position_data = request.data.get('position')
+        device_data = request.data.get('device')
+        
+        if not position_data or not device_data:
+            return Response(
+                {'error': 'Missing position or device data'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        device_id = device_data['uniqueId']
+        
+        # Buscar niño por dispositivo_id
+        try:
+            nino = Nino.objects.get(
+                dispositivo_id=device_id,
+                activo=True,
+                tracking_activo=True
+            )
+        except Nino.DoesNotExist:
+            logger.warning(f"⚠️ Dispositivo {device_id} no vinculado a ningún niño")
+            return Response(
+                {'error': f'No child registered with device ID: {device_id}'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Usar TraccarService para sincronizar posición
+        traccar = TraccarService()
+        posicion = traccar.sync_position_to_django(nino, position_data)
+        
+        if posicion:
+            logger.info(f"✅ Webhook procesado: {nino.nombre_completo()} - Posición ID {posicion.id}")
+            return Response(
+                {
+                    'success': True,
+                    'posicion_id': posicion.id,
+                    'nino_id': nino.id,
+                    'nino_nombre': nino.nombre_completo(),
+                    'dentro_area_segura': posicion.dentro_area_segura,
+                    'timestamp': posicion.timestamp.isoformat()
+                },
+                status=status.HTTP_201_CREATED
+            )
+        else:
+            return Response(
+                {'error': 'Failed to create position'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    except Exception as e:
+        logger.error(f"❌ Error procesando webhook Traccar: {e}")
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

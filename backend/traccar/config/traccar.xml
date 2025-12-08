@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE properties SYSTEM 'http://java.sun.com/dtd/properties.dtd'>
+
+<properties>
+
+    <!-- Web interface configuration -->
+    <entry key='web.enable'>true</entry>
+    <entry key='web.port'>8082</entry>
+    <entry key='web.path'>/opt/traccar/web</entry>
+
+    <!-- Database configuration - PostgreSQL -->
+    <entry key='database.driver'>org.postgresql.Driver</entry>
+    <entry key='database.url'>jdbc:postgresql://monitor_infantil_db:5432/traccar</entry>
+    <entry key='database.user'>postgres</entry>
+    <entry key='database.password'>postgres123</entry>
+
+    <!-- Automatic database schema creation/update -->
+    <entry key='database.changelog'>./schema/changelog-master.xml</entry>
+
+    <!-- Server configuration -->
+    <entry key='server.timeout'>120</entry>
+    <entry key='server.statistics'>true</entry>
+
+    <!-- Event forwarding to Django webhook -->
+    <entry key='event.enable'>true</entry>
+    <entry key='event.forward.enable'>true</entry>
+    <entry key='event.forward.url'>http://backend-web_backend-1:8000/api/traccar/webhook/</entry>
+    <entry key='event.forward.header'>Authorization: Bearer my-super-secret-webhook-token-123456</entry>
+    
+    <!-- Forward device position updates -->
+    <entry key='event.forward.type'>deviceMoving,deviceStopped,deviceOnline,deviceOffline</entry>
+
+    <!-- Position forwarding configuration -->
+    <entry key='forward.enable'>true</entry>
+    <entry key='forward.url'>http://backend-web_backend-1:8000/api/traccar/webhook/</entry>
+    <entry key='forward.header'>Authorization: Bearer my-super-secret-webhook-token-123456</entry>
+    
+    <!-- Protocol configuration -->
+    <!-- OsmAnd protocol (used by Traccar Client) -->
+    <entry key='osmand.port'>5055</entry>
+    
+    <!-- Additional common protocols (optional, can be enabled as needed) -->
+    <entry key='gps103.port'>5001</entry>
+    <entry key='tk103.port'>5002</entry>
+    <entry key='gl200.port'>5003</entry>
+    <entry key='h02.port'>5013</entry>
+    
+    <!-- Geofencing -->
+    <entry key='geofence.polylineDistance'>25</entry>
+
+    <!-- Logging -->
+    <entry key='logger.enable'>true</entry>
+    <entry key='logger.level'>info</entry>
+    <entry key='logger.file'>/opt/traccar/logs/tracker-server.log</entry>
+
+    <!-- Performance tuning -->
+    <entry key='processing.computedAttributes.enable'>true</entry>
+    <entry key='processing.copyAttributes.enable'>true</entry>
+
+</properties>

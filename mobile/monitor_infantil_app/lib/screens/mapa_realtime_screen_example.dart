@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../providers/gps_tracking_provider.dart';
 import '../providers/auth_provider.dart';
+import '../config/api_config.dart';
 
 /// Ejemplo de pantalla de mapa con WebSocket GPS en tiempo real.
 /// 
@@ -45,7 +46,7 @@ class _MapaRealTimeScreenState extends State<MapaRealTimeScreen> {
     // Solo conectar si el usuario está autenticado
     if (authProvider.isAuthenticated && authProvider.tutorId != null && authProvider.token != null) {
       gpsProvider.connect(
-        serverUrl: 'https://monitor-infantil.duckdns.org', // HTTPS → WSS automático
+        serverUrl: ApiConfig.baseUrl, // Usar configuración del entorno
         tutorId: authProvider.tutorId!,
         authToken: authProvider.token,
       );
