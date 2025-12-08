@@ -328,6 +328,7 @@ class BusquedaCercanosViewSet(viewsets.ViewSet):
                     p.dentro_area_segura,
                     p.velocidad_kmh,
                     p.precision_metros,
+                    p.nivel_bateria,
                     ce.nombre AS kinder_nombre,
                     ce.direccion AS kinder_direccion
                 FROM
@@ -385,9 +386,10 @@ class BusquedaCercanosViewSet(viewsets.ViewSet):
                         'dentro_area_segura': row[7],
                         'velocidad_kmh': round(row[8], 1) if row[8] else 0,
                         'precision_metros': round(row[9], 1) if row[9] else None,
+                        'nivel_bateria': row[10] if row[10] else 0,
                         'kinder': {
-                            'nombre': row[10],
-                            'direccion': row[11]
+                            'nombre': row[11],
+                            'direccion': row[12]
                         },
                         'estado': '🟢 Seguro' if row[7] else '🔴 Fuera del área',
                         'estado_color': 'green' if row[7] else 'red'
