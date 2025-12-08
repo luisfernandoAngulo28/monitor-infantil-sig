@@ -8,7 +8,7 @@ class Nino {
   final int? edad;
   final String? sexo;
   final String? foto;
-  final CentroEducativo centroEducativo;
+  final CentroEducativo? centroEducativo;
   final bool trackingActivo;
   final bool activo;
 
@@ -22,7 +22,7 @@ class Nino {
     this.edad,
     this.sexo,
     this.foto,
-    required this.centroEducativo,
+    this.centroEducativo,
     required this.trackingActivo,
     required this.activo,
   });
@@ -38,7 +38,9 @@ class Nino {
       edad: json['edad'],
       sexo: json['sexo'],
       foto: json['foto'],
-      centroEducativo: CentroEducativo.fromJson(json['centro_educativo']),
+      centroEducativo: json['centro_educativo'] != null 
+          ? CentroEducativo.fromJson(json['centro_educativo'])
+          : null,
       trackingActivo: json['tracking_activo'],
       activo: json['activo'],
     );

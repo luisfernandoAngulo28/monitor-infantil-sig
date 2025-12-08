@@ -194,7 +194,7 @@ GPS_UPDATE_INTERVAL_SECONDS = 30  # Actualización GPS cada 30 segundos
 ALERT_COOLDOWN_MINUTES = 5  # No enviar alertas repetidas en 5 minutos
 
 # Traccar GPS Server Configuration
-TRACCAR_SERVER_URL = config('TRACCAR_SERVER_URL', default='http://traccar:8082/api')
+TRACCAR_SERVER_URL = config('TRACCAR_SERVER_URL', default='http://192.168.0.59:8082/api')
 TRACCAR_USERNAME = config('TRACCAR_USERNAME', default='admin')
 TRACCAR_PASSWORD = config('TRACCAR_PASSWORD', default='admin')
 TRACCAR_WEBHOOK_SECRET = config('TRACCAR_WEBHOOK_SECRET', default='change-this-secret-token-in-production')

@@ -183,7 +183,7 @@ class GPSTrackingConsumer(AsyncWebsocketConsumer):
             'nino_nombre': event.get('nino_nombre'),
             'timestamp': event.get('timestamp'),
             'lat': event['lat'],
-            'lon': event['lon'],
+            'lng': event['lon'],  # Renombrar lon a lng para consistencia con Flutter
             'precision_metros': event.get('precision_metros'),
             'dentro_area_segura': event.get('dentro_area_segura'),
             'nivel_bateria': event.get('nivel_bateria'),

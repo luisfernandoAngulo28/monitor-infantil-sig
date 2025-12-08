@@ -66,11 +66,21 @@ class NinoViewSet(viewsets.ModelViewSet):
         return NinoSerializer
     
     def create(self, request, *args, **kwargs):
-        """Override create para logging detallado"""
+        """Override create para logging detallado y respuesta completa"""
         print(f"🔍 DEBUG create() - Request data: {request.data}")
         print(f"🔍 DEBUG create() - User: {request.user}, Authenticated: {request.user.is_authenticated}")
         print(f"🔍 DEBUG create() - Headers: {dict(request.headers)}")
-        return super().create(request, *args, **kwargs)
+        
+        # Crear con CrearNinoSerializer
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        
+        # Responder con NinoSerializer completo
+        instance = serializer.instance
+        response_serializer = NinoSerializer(instance)
+        headers = self.get_success_headers(response_serializer.data)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
     def get_queryset(self):
         """Filtrar niños del tutor autenticado"""

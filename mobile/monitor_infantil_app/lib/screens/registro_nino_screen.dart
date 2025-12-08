@@ -80,18 +80,24 @@ class _RegistroNinoScreenState extends State<RegistroNinoScreen> {
     });
 
     try {
-      final ninoData = {
+      final ninoData = <String, dynamic>{
         'nombre': _nombreController.text.trim(),
         'apellido_paterno': _apellidoPaternoController.text.trim(),
         'apellido_materno': _apellidoMaternoController.text.trim(),
         'fecha_nacimiento': DateFormat('yyyy-MM-dd').format(_fechaNacimiento!),
         'sexo': _sexo,
-        'centro_educativo': _centroEducativoId,
-        'dispositivo_id': _dispositivoIdController.text.trim().isEmpty 
-            ? null 
-            : _dispositivoIdController.text.trim(),
         'tracking_activo': _trackingActivo,
       };
+      
+      // Solo agregar centro_educativo si tiene valor
+      if (_centroEducativoId != null) {
+        ninoData['centro_educativo'] = _centroEducativoId;
+      }
+      
+      // Solo agregar dispositivo_id si no está vacío
+      if (_dispositivoIdController.text.trim().isNotEmpty) {
+        ninoData['dispositivo_id'] = _dispositivoIdController.text.trim();
+      }
 
       final nino = await _apiService.crearNino(ninoData);
 

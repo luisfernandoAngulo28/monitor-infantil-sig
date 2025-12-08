@@ -136,8 +136,11 @@ class ApiService {
         data: ninoData,
       );
       return Nino.fromJson(response.data);
-    } catch (e) {
+    } on DioException catch (e) {
       print('Error al crear niño: $e');
+      if (e.response?.data != null) {
+        print('Detalles del error: ${e.response?.data}');
+      }
       rethrow;
     }
   }
