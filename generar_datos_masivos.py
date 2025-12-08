@@ -191,7 +191,7 @@ def generar_sql_ninos():
 -- Niño {i}: {nombre} {apellido_p} {apellido_m}
 INSERT INTO gis_tracking_nino (
     nombre, apellido_paterno, apellido_materno, fecha_nacimiento, sexo,
-    centro_educativo_id, tutor_principal_id, activo, tracking_activo, dispositivo_id
+    centro_educativo_id, tutor_principal_id, activo, tracking_activo, dispositivo_id, fecha_registro
 ) VALUES (
     '{nombre}',
     '{apellido_p}',
@@ -202,7 +202,8 @@ INSERT INTO gis_tracking_nino (
     {tutor_id},
     true,
     true,
-    'device_{i:03d}_{nombre.lower()}'
+    'device_{i:03d}_{nombre.lower()}',
+    NOW()
 );"""
         sql_statements.append(sql)
     
