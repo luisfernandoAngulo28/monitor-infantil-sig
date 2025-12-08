@@ -215,7 +215,10 @@ def generar_sql_posiciones():
     
     sql_statements = []
     
-    for nino_id in range(1, CANTIDAD_NINOS + 1):
+    for i in range(1, CANTIDAD_NINOS + 1):
+        # Obtener el niño por su dispositivo_id único
+        dispositivo_id = f"device_{i:03d}_"  # Prefijo del dispositivo
+        
         # Generar posiciones para los últimos días
         for j in range(POSICIONES_POR_NINO):
             # Timestamp aleatorio en los últimos 7 días
@@ -235,12 +238,12 @@ def generar_sql_posiciones():
             precision = random.uniform(3, 20)
             
             sql = f"""
--- Posición GPS - Niño {nino_id} - {timestamp.strftime('%Y-%m-%d %H:%M')}
+-- Posición GPS - Niño {i} - {timestamp.strftime('%Y-%m-%d %H:%M')}
 INSERT INTO gis_tracking_posiciongps (
     nino_id, ubicacion, timestamp, nivel_bateria, dentro_area_segura,
     velocidad_kmh, precision_metros
 ) VALUES (
-    {nino_id},
+    (SELECT id FROM gis_tracking_nino WHERE dispositivo_id LIKE '{dispositivo_id}%'),
     ST_GeomFromText('POINT({lng} {lat})', 4326),
     '{timestamp.isoformat()}',
     {bateria},
