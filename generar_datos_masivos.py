@@ -85,7 +85,7 @@ def generar_sql_kinders():
         sql = f"""
 -- Kinder {i}: {nombre} - {zona['nombre']}
 INSERT INTO gis_tracking_centroeducativo (
-    nombre, codigo, direccion, telefono, email, area_segura, margen_metros, activo
+    nombre, codigo, direccion, telefono, email, area_segura, margen_metros, activo, fecha_registro
 ) VALUES (
     '{nombre} - {zona["nombre"]}',
     '{codigo}',
@@ -94,7 +94,8 @@ INSERT INTO gis_tracking_centroeducativo (
     '{email}',
     {poligono},
     10,
-    true
+    true,
+    NOW()
 );"""
         sql_statements.append(sql)
     
