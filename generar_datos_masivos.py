@@ -122,7 +122,7 @@ def generar_sql_tutores():
 -- Usuario tutor {i}
 INSERT INTO core_usuario (
     password, last_login, is_superuser, username, first_name, last_name,
-    email, is_staff, is_active, date_joined, tipo_usuario, telefono
+    email, is_staff, is_active, date_joined, tipo_usuario, telefono, direccion
 ) VALUES (
     '{password}',
     NULL,
@@ -135,7 +135,8 @@ INSERT INTO core_usuario (
     true,
     NOW(),
     'TUTOR',
-    '{telefono}'
+    '{telefono}',
+    ''
 );"""
         
         # Crear tutor vinculado al usuario
