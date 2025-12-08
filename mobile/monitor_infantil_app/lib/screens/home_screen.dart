@@ -7,6 +7,7 @@ import 'mapa_realtime_screen_example.dart';
 import 'alertas_screen.dart';
 import 'login_screen.dart';
 import 'registro_nino_screen.dart';
+import 'busqueda_cercanos_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -38,6 +39,19 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Monitor Infantil'),
         actions: [
+          // Botón de búsqueda cercanos
+          IconButton(
+            icon: const Icon(Icons.search_outlined),
+            tooltip: 'Buscar niños cercanos',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const BusquedaCercanosScreen(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {

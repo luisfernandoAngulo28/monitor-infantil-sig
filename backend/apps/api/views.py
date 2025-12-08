@@ -559,8 +559,8 @@ class BusquedaCercanosViewSet(viewsets.ViewSet):
                     ) AS distancia_metros,
                     p.timestamp,
                     p.dentro_area_segura,
-                    p.velocidad,
-                    p.precision,
+                    p.velocidad_kmh,
+                    p.precision_metros,
                     ce.nombre AS kinder_nombre,
                     ce.direccion AS kinder_direccion
                 FROM

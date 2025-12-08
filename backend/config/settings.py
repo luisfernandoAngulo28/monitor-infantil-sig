@@ -30,7 +30,7 @@ if DEBUG:
             return self.META.get('HTTP_HOST', 'localhost')
     HttpRequest.get_host = _patched_get_host
 else:
-    ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,143.198.30.170').split(',')
+    ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,143.198.30.170,monitor-infantil.duckdns.org').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -198,3 +198,11 @@ TRACCAR_SERVER_URL = config('TRACCAR_SERVER_URL', default='http://traccar:8082/a
 TRACCAR_USERNAME = config('TRACCAR_USERNAME', default='admin')
 TRACCAR_PASSWORD = config('TRACCAR_PASSWORD', default='admin')
 TRACCAR_WEBHOOK_SECRET = config('TRACCAR_WEBHOOK_SECRET', default='change-this-secret-token-in-production')
+
+# CSRF Configuration for HTTPS
+CSRF_TRUSTED_ORIGINS = [
+    'https://monitor-infantil.duckdns.org',
+    'http://143.198.30.170:8000',
+]
+CSRF_COOKIE_SECURE = False  # True en producción con HTTPS certificado
+SESSION_COOKIE_SECURE = False  # True en producción con HTTPS certificado
