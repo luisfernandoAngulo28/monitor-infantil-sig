@@ -122,7 +122,7 @@ def generar_sql_tutores():
 -- Usuario tutor {i}
 INSERT INTO core_usuario (
     password, last_login, is_superuser, username, first_name, last_name,
-    email, is_staff, is_active, date_joined, tipo_usuario, telefono, direccion, firebase_token
+    email, is_staff, is_active, date_joined, tipo_usuario, telefono, direccion, firebase_token, notificaciones_activas
 ) VALUES (
     '{password}',
     NULL,
@@ -137,7 +137,8 @@ INSERT INTO core_usuario (
     'TUTOR',
     '{telefono}',
     '',
-    ''
+    '',
+    true
 );"""
         
         # Crear tutor vinculado al usuario
