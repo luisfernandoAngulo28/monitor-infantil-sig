@@ -181,8 +181,8 @@ def generar_sql_ninos():
         
         sexo = random.choice(['M', 'F'])
         
-        # Asignar a un kinder aleatorio (del 1 al 20)
-        kinder_id = random.randint(1, min(CANTIDAD_KINDERS, 20))
+        # Asignar a un kinder aleatorio usando ORDER BY RANDOM()
+        # Esto funciona tanto para los kinders existentes como los nuevos
         
         # Asignar tutor (del 1 al número actual)
         tutor_id = i  # Cada niño tiene su propio tutor
@@ -198,7 +198,7 @@ INSERT INTO gis_tracking_nino (
     '{apellido_m}',
     '{fecha_nac}',
     '{sexo}',
-    {kinder_id},
+    (SELECT id FROM gis_tracking_centroeducativo ORDER BY RANDOM() LIMIT 1),
     {tutor_id},
     true,
     true,
