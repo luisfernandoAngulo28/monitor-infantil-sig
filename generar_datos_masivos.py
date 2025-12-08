@@ -184,8 +184,8 @@ def generar_sql_ninos():
         # Asignar a un kinder aleatorio usando ORDER BY RANDOM()
         # Esto funciona tanto para los kinders existentes como los nuevos
         
-        # Asignar tutor (del 1 al número actual)
-        tutor_id = i  # Cada niño tiene su propio tutor
+        # Asignar tutor usando el username correspondiente
+        username_tutor = f"tutor{i:03d}"
         
         sql = f"""
 -- Niño {i}: {nombre} {apellido_p} {apellido_m}
@@ -199,7 +199,7 @@ INSERT INTO gis_tracking_nino (
     '{fecha_nac}',
     '{sexo}',
     (SELECT id FROM gis_tracking_centroeducativo ORDER BY RANDOM() LIMIT 1),
-    {tutor_id},
+    (SELECT id FROM core_tutor WHERE usuario_id = (SELECT id FROM core_usuario WHERE username = '{username_tutor}')),
     true,
     true,
     'device_{i:03d}_{nombre.lower()}',
