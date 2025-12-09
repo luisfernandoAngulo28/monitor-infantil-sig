@@ -12,7 +12,7 @@ class ApiConfig {
   // static const String baseUrl = 'http://10.0.2.2:8000';
   
   // Android Emulator con Docker - Usar IP de red local
-  static const String baseUrl = 'http://192.168.0.59:8000';
+  // static const String baseUrl = 'http://10.80.243.77:8000';
   
   // Linux Desktop / Chrome (desarrollo local)
   // static const String baseUrl = 'http://localhost:8000';
@@ -21,7 +21,7 @@ class ApiConfig {
   // static const String baseUrl = 'http://localhost:8000';
   
   // Dispositivo físico en la misma red (cambiar IP)
-  // static const String baseUrl = 'http://192.168.1.100:8000';
+  static const String baseUrl = 'http://10.80.243.77:8000';
   
   static const String apiUrl = '$baseUrl/api';
   

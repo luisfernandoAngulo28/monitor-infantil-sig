@@ -99,6 +99,14 @@ class ApiService {
   Future<List<Alerta>> getMisAlertas() async {
     try {
       final response = await _dio.get(ApiConfig.misAlertasUrl);
+      
+      // La API devuelve una respuesta paginada: {count, next, previous, results: [...]}
+      if (response.data is Map && response.data.containsKey('results')) {
+        final List<dynamic> data = response.data['results'];
+        return data.map((json) => Alerta.fromJson(json)).toList();
+      }
+      
+      // Fallback: si no es paginada, intentar parsearlo como lista directa
       final List<dynamic> data = response.data;
       return data.map((json) => Alerta.fromJson(json)).toList();
     } catch (e) {

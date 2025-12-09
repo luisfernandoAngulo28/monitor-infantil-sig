@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../providers/gps_tracking_provider.dart';
+import '../providers/ninos_provider.dart';
 import '../providers/auth_provider.dart';
 import '../config/api_config.dart';
 
@@ -27,10 +28,16 @@ class _MapaRealTimeScreenState extends State<MapaRealTimeScreen> {
   @override
   void initState() {
     super.initState();
-    // Conectar WebSocket después de que el widget esté construido
+    // Conectar WebSocket y cargar niños después de que el widget esté construido
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _connectWebSocket();
+      _loadNinos();
     });
+  }
+
+  void _loadNinos() {
+    // Cargar lista de niños
+    Provider.of<NinosProvider>(context, listen: false).cargarNinos();
   }
 
   void _connectWebSocket() {

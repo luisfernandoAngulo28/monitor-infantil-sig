@@ -140,6 +140,45 @@ class Nino(models.Model):
             (today.month, today.day) < 
             (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
         )
+    
+    def delete(self, *args, **kwargs):
+        """Override delete para enviar notificación WebSocket"""
+        # Guardar ID del niño y tutores antes de eliminar
+        nino_id = self.id
+        tutor_id = self.tutor_principal.usuario.id
+        tutores_adicionales_ids = [t.usuario.id for t in self.tutores_adicionales.all()]
+        
+        # Eliminar el niño
+        result = super().delete(*args, **kwargs)
+        
+        # Enviar notificación WebSocket a todos los tutores
+        from channels.layers import get_channel_layer
+        from asgiref.sync import async_to_sync
+        
+        channel_layer = get_channel_layer()
+        
+        # Notificar al tutor principal
+        async_to_sync(channel_layer.group_send)(
+            f'tutor_{tutor_id}',
+            {
+                'type': 'nino_deleted',
+                'nino_id': nino_id,
+                'message': f'El niño/a ha sido eliminado del sistema'
+            }
+        )
+        
+        # Notificar a tutores adicionales
+        for tutor_id_adicional in tutores_adicionales_ids:
+            async_to_sync(channel_layer.group_send)(
+                f'tutor_{tutor_id_adicional}',
+                {
+                    'type': 'nino_deleted',
+                    'nino_id': nino_id,
+                    'message': f'El niño/a ha sido eliminado del sistema'
+                }
+            )
+        
+        return result
 
 
 class PosicionGPS(models.Model):

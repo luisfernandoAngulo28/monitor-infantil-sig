@@ -93,13 +93,18 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: screens[_currentIndex],
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const RegistroNinoScreen(),
             ),
           );
+          
+          // Si se guardó un niño exitosamente, recargar la lista
+          if (result == true && mounted) {
+            Provider.of<NinosProvider>(context, listen: false).cargarNinos();
+          }
         },
         icon: const Icon(Icons.person_add),
         label: const Text('Registrar Niño'),

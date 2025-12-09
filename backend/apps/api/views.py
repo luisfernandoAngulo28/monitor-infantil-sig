@@ -513,6 +513,97 @@ def ingesta_gps_chino(request):
     return Response(response_data, status=status.HTTP_201_CREATED)
 
 
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def ingesta_gps_traccar(request):
+    """
+    Endpoint de ingesta para datos GPS desde Traccar (Poller o Webhook)
+    POST /api/ingesta/gps-traccar/
+    
+    Payload esperado:
+    {
+        "imei": "69261956",
+        "latitud": -17.7762929,
+        "longitud": -63.1951093,
+        "precision_metros": 10.0,
+        "nivel_bateria": 85,
+        "velocidad_kmh": 0.0,
+        "timestamp": "2025-12-09T00:55:04.249Z"
+    }
+    """
+    imei = request.data.get('imei')
+    latitud = request.data.get('latitud')
+    longitud = request.data.get('longitud')
+    precision = request.data.get('precision_metros', 10.0)
+    bateria = request.data.get('nivel_bateria', 0)
+    velocidad = request.data.get('velocidad_kmh', 0.0)
+    timestamp_str = request.data.get('timestamp')
+    
+    if not all([imei, latitud, longitud]):
+        return Response(
+            {'error': 'Faltan datos requeridos: imei, latitud, longitud'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Buscar niño por dispositivo_id (IMEI/uniqueId de Traccar)
+    try:
+        nino = Nino.objects.get(dispositivo_id=imei, activo=True)
+    except Nino.DoesNotExist:
+        return Response(
+            {
+                'error': 'Dispositivo no encontrado',
+                'mensaje': f'No existe ningún niño con dispositivo_id: {imei}'
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    if not nino.tracking_activo:
+        return Response(
+            {'error': 'Tracking desactivado'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    # Crear punto geográfico
+    punto_gps = Point(float(longitud), float(latitud), srid=4326)
+    
+    # Parsear timestamp si se proporciona
+    timestamp = timezone.now()
+    if timestamp_str:
+        from dateutil import parser
+        try:
+            timestamp = parser.parse(timestamp_str)
+        except:
+            pass
+    
+    # Crear registro de posición
+    posicion = PosicionGPS.objects.create(
+        nino=nino,
+        ubicacion=punto_gps,
+        precision_metros=precision,
+        nivel_bateria=bateria,
+        velocidad_kmh=velocidad,
+        timestamp=timestamp
+    )
+    
+    response_data = {
+        'success': True,
+        'mensaje': 'Posición GPS registrada desde Traccar',
+        'nino': {
+            'id': nino.id,
+            'nombre': nino.nombre_completo()
+        },
+        'posicion': {
+            'id': posicion.id,
+            'lat': latitud,
+            'lon': longitud,
+            'dentro_area_segura': posicion.dentro_area_segura,
+            'timestamp': posicion.timestamp.isoformat()
+        }
+    }
+    
+    return Response(response_data, status=status.HTTP_201_CREATED)
+
+
 class BusquedaCercanosViewSet(viewsets.ViewSet):
     """
     API para búsqueda espacial de niños cercanos

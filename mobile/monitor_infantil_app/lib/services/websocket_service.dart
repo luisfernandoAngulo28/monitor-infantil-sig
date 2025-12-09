@@ -124,6 +124,10 @@ class WebSocketService {
           debugPrint('🚨 ALERTA: ${data['mensaje']}');
           break;
         
+        case 'nino_deleted':
+          debugPrint('🗑️ Niño eliminado - ID: ${data['nino_id']}');
+          break;
+        
         case 'pong':
           // Respuesta a ping - conexión viva
           break;

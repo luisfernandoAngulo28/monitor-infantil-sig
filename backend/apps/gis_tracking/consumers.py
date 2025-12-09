@@ -218,6 +218,16 @@ class GPSTrackingConsumer(AsyncWebsocketConsumer):
             'timestamp': event['timestamp']
         }))
     
+    async def nino_deleted(self, event):
+        """
+        Notifica cuando un niño ha sido eliminado del sistema.
+        """
+        await self.send(text_data=json.dumps({
+            'type': 'nino_deleted',
+            'nino_id': event['nino_id'],
+            'message': event['message']
+        }))
+    
     @database_sync_to_async
     def verify_tutor_access(self):
         """Verifica que el usuario tenga acceso a este tutor."""

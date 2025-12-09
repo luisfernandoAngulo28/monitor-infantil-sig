@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../services/api_service.dart';
@@ -15,11 +16,22 @@ class _AlertasScreenState extends State<AlertasScreen> {
   List<Alerta> _alertas = [];
   bool _isLoading = false;
   String? _error;
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _cargarAlertas();
+    // Actualizar cada 10 segundos
+    _refreshTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      _cargarAlertas();
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _cargarAlertas() async {
@@ -29,12 +41,15 @@ class _AlertasScreenState extends State<AlertasScreen> {
     });
 
     try {
+      print('📋 Cargando alertas...');
       final alertas = await _apiService.getMisAlertas();
+      print('✅ Alertas cargadas: ${alertas.length}');
       setState(() {
         _alertas = alertas;
         _isLoading = false;
       });
     } catch (e) {
+      print('❌ Error al cargar alertas: $e');
       setState(() {
         _error = e.toString();
         _isLoading = false;
